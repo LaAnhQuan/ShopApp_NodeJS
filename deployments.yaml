@@ -1,0 +1,11 @@
+services: 
+  mysql:
+    image: mysql:5.7.40
+    container_name: mysql_container
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "" #Blank password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "shopapp_online"
+    restart: always
