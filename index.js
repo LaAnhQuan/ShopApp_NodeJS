@@ -35,4 +35,22 @@ WHERE table_schema = 'shopapp_online' AND table_name = 'banner_details';
 
 */
 
+// const express = require('express')
+
+import express from 'express';
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+
+const app = express()
+
+app.get('/', (req, res) => {
+    res.send('Hello toi dey hello vn ')
+})
+
+app.listen(process.env.PORT, () => {
+    console.log(`Example app listening on port ${process.env.PORT}`)
+})
+
 
