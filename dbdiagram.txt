@@ -67,7 +67,7 @@ Table orders {
   user_id int
   status int
   note text
-  content text
+  total int
   created_at datetime
   updated_at datetime
 }
@@ -118,7 +118,7 @@ Ref: "products"."id" < "order_details"."product_id"
 
 Table banner {
   id int [pk]
-  name varchar
+  name varchar 
   image text
   status int
   created_at datetime
