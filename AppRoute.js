@@ -5,42 +5,49 @@ import * as BrandController from './controllers/BrandController';
 import * as OrderController from './controllers/OrderController';
 import * as OrderDetailController from './controllers/OrderDetailController';
 import asyncHandler from './middlewares/asyncHandler';
+import validate from './middlewares/validate';
+import InsertProductRequest from './dtos/requests/InsertProductRequest';
+
 
 const router = express.Router();
 
 // Product Routes
-router.get('/products', ProductController.getProducts);
-router.get('/products/:id', ProductController.getProductById);
-router.post('/products', asyncHandler(ProductController.insertProduct));
-router.put('/products/:id', ProductController.updateProduct);
-router.delete('/products/:id', ProductController.deleteProduct);
+router.get('/products', asyncHandler(ProductController.getProducts));
+router.get('/products/:id', asyncHandler(ProductController.getProductById));
+router.post('/products',
+    validate(InsertProductRequest),
+    asyncHandler(ProductController.insertProduct)
+);
+router.put('/products/:id', asyncHandler(ProductController.updateProduct));
+router.delete('/products/:id', asyncHandler(ProductController.deleteProduct));
 
 // Category Routes
-router.get('/categories', CategoryController.getCategories);
-router.get('/categories/:id', CategoryController.getCategoryById);
-router.post('/categories', CategoryController.insertCategory);
-router.put('/categories/:id', CategoryController.updateCategory);
-router.delete('/categories/:id', CategoryController.deleteCategory);
+router.get('/categories', asyncHandler(CategoryController.getCategories));
+router.get('/categories/:id', asyncHandler(CategoryController.getCategoryById));
+router.post('/categories', asyncHandler(CategoryController.insertCategory));
+router.put('/categories/:id', asyncHandler(CategoryController.updateCategory));
+router.delete('/categories/:id', asyncHandler(CategoryController.deleteCategory));
 
 // Brand Routes
-router.get('/brands', BrandController.getBrands);
-router.get('/brands/:id', BrandController.getBrandById);
-router.post('/brands', BrandController.insertBrand);
-router.put('/brands/:id', BrandController.updateBrand);
-router.delete('/brands/:id', BrandController.deleteBrand);
+router.get('/brands', asyncHandler(BrandController.getBrands));
+router.get('/brands/:id', asyncHandler(BrandController.getBrandById));
+router.post('/brands', asyncHandler(BrandController.insertBrand));
+router.put('/brands/:id', asyncHandler(BrandController.updateBrand));
+router.delete('/brands/:id', asyncHandler(BrandController.deleteBrand));
 
 // Order Routes
-router.get('/orders', OrderController.getOrders);
-router.get('/orders/:id', OrderController.getOrderById);
-router.post('/orders', OrderController.insertOrder);
-router.put('/orders/:id', OrderController.updateOrder);
-router.delete('/orders/:id', OrderController.deleteOrder);
+router.get('/orders', asyncHandler(OrderController.getOrders));
+router.get('/orders/:id', asyncHandler(OrderController.getOrderById));
+router.post('/orders', asyncHandler(OrderController.insertOrder));
+router.put('/orders/:id', asyncHandler(OrderController.updateOrder));
+router.delete('/orders/:id', asyncHandler(OrderController.deleteOrder));
 
 // OrderDetail Routes
-router.get('/order-details', OrderDetailController.getOrderDetails);
-router.get('/order-details/:id', OrderDetailController.getOrderDetailById);
-router.post('/order-details', OrderDetailController.insertOrderDetail);
-router.put('/order-details/:id', OrderDetailController.updateOrderDetail);
-router.delete('/order-details/:id', OrderDetailController.deleteOrderDetail);
+router.get('/order-details', asyncHandler(OrderDetailController.getOrderDetails));
+router.get('/order-details/:id', asyncHandler(OrderDetailController.getOrderDetailById));
+router.post('/order-details', asyncHandler(OrderDetailController.insertOrderDetail));
+router.put('/order-details/:id', asyncHandler(OrderDetailController.updateOrderDetail));
+router.delete('/order-details/:id', asyncHandler(OrderDetailController.deleteOrderDetail));
+
 
 module.exports = router;

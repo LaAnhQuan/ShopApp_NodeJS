@@ -15,21 +15,11 @@ module.exports = {
     },
 
     insertProduct: async (req, res) => {
-        const { error } = InsertProductRequest.validate(req.body)
-        if (error) {
-            return res.status(400).json({
-                message: 'Bug when insert product',
-                error: error.details[0]?.message
-            });
-
-        }
-        // console.log(req.body)
         const product = await db.Product.create(req.body)
         res.status(201).json({
             message: 'Insert a product successfully',
             data: product
         })
-
     },
 
     deleteProduct: async (req, res) => {
