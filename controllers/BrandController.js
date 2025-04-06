@@ -61,30 +61,46 @@ module.exports = {
     },
 
     insertBrand: async (req, res) => {
-        try {
-            // console.log(req.body)
-            const brand = await db.Brand.create(req.body);  // Thêm một thương hiệu mới vào bảng Brand
-            res.status(201).json({
-                message: 'Insert a brand successfully',
-                data: brand
+        const brand = await db.Brand.create(req.body);  // Thêm một thương hiệu mới vào bảng Brand
+        res.status(201).json({
+            message: 'Insert a brand successfully',
+            data: brand
+        });
+    },
+
+    deleteBrand: async (req, res) => {
+        const { id } = req.params;  // Lấy id của thương hiệu từ URL
+        const deleted = await db.Brand.destroy({
+            where: { id }
+        });
+
+        if (deleted) {
+            res.status(200).json({
+                message: 'Delete a brand successfully'
             });
-        } catch (error) {
-            res.status(500).json({
-                message: 'Error when add a brand',
-                error: error.message
+        } else {
+            res.status(404).json({
+                message: 'Brand not found'
             });
         }
     },
 
-    deleteBrand: async (req, res) => {
-        res.status(200).json({
-            message: 'Delete a brand successfully'
-        })
-    },
 
     updateBrand: async (req, res) => {
-        res.status(200).json({
-            message: 'Update a brand successfully'
-        })
-    },
+        const brandId = req.params.id;  // Lấy id của thương hiệu từ URL
+        const updatedBrand = await db.Brand.update(req.body, {
+            where: { id: brandId }
+        });
+
+        if (updatedBrand[0] > 0) {  // Sequelize `update` trả về mảng với phần tử đầu tiên là số dòng bị ảnh hưởng
+            return res.status(200).json({
+                message: 'Brand updated successfully',
+            });
+        } else {
+            return res.status(404).json({
+                message: 'Brand not found'
+            });
+        }
+    }
+
 }

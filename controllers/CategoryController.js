@@ -76,14 +76,36 @@ module.exports = {
     },
 
     deleteCategory: async (req, res) => {
-        res.status(200).json({
-            message: 'Delete a category successfully'
-        })
+        const { id } = req.params;  // Lấy id từ params trong URL
+        const deleted = await db.Category.destroy({
+            where: { id }
+        });
+
+        if (deleted) {
+            res.status(200).json({
+                message: 'Delete a category successfully'
+            });
+        } else {
+            res.status(404).json({
+                message: 'Category not found'
+            });
+        }
     },
 
     updateCategory: async (req, res) => {
-        res.status(200).json({
-            message: 'Update a category successfully'
-        })
-    },
+        const categoryId = req.params.id;  // Lấy id của danh mục từ params
+        const updatedCategory = await db.Category.update(req.body, {
+            where: { id: categoryId }
+        });
+
+        if (updatedCategory[0] > 0) {  // Sequelize `update` trả về mảng với phần tử đầu tiên là số dòng bị ảnh hưởng
+            return res.status(200).json({
+                message: 'Category updated successfully',
+            });
+        } else {
+            return res.status(404).json({
+                message: 'Category not found'
+            });
+        }
+    }
 }

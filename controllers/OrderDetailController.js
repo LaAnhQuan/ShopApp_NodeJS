@@ -3,11 +3,12 @@ import db from "../models"
 
 module.exports = {
     getOrderDetails: async (req, res) => {
+        const orderDetails = await db.OrderDetail.findAll();  // Lấy tất cả các chi tiết đơn hàng
         res.status(200).json({
-            message: 'Get order details successfully'
+            message: 'Get order details successfully',
+            data: orderDetails
         })
     },
-
     getOrderDetailById: async (req, res) => {
         res.status(200).json({
             message: 'Get an order detail successfully'

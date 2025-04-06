@@ -1,7 +1,7 @@
-import { Sequelize } from "sequelize"
+import { Sequelize, where } from "sequelize"
 const { Op } = Sequelize;
 import db from "../models"
-import InsertProductRequest from "../dtos/requests/InsertProductRequest"
+import InsertProductRequest from "../dtos/requests/product/InsertProductRequest"
 import { date } from "joi"
 
 module.exports = {
@@ -44,6 +44,24 @@ module.exports = {
 
     },
 
+    getProductById: async (req, res) => {
+        const { id } = req.params;  // Lấy id từ params trong URL
+        const product = await db.Product.findOne({
+            where: { id }  // Tìm sản phẩm có id tương ứng
+        });
+
+        if (product) {
+            res.status(200).json({
+                message: 'Product found successfully',
+                data: product
+            });
+        } else {
+            res.status(404).json({
+                message: 'Product not found'
+            });
+        }
+    },
+
     insertProduct: async (req, res) => {
         const product = await db.Product.create(req.body)
         res.status(201).json({
@@ -53,15 +71,38 @@ module.exports = {
     },
 
     deleteProduct: async (req, res) => {
-        res.status(200).json({
-            message: 'Delete a product successfully'
-        })
+        const { id } = req.params;
+        const deleted = await db.Product.destroy({
+            where: { id }
+        });
+        if (deleted) {
+            res.status(200).json({
+                message: 'Delete a product successfully'
+            })
+        } else {
+            res.status(404).json({
+                message: 'Product is not found'
+            })
+        }
+
     },
 
     updateProduct: async (req, res) => {
-        res.status(200).json({
-            message: 'Update a product successfully'
-        })
+        const productId = req.params.id;
+        const updatedProduct = await db.Product.update(req.body, {
+            where: { id: productId }
+        });
+
+
+        if (updatedProduct[0] > 0) {  // Sequelize `update` returns an array where the first element is the number of affected rows
+            return res.status(200).json({
+                message: 'Product updated successfully',
+            });
+        } else {
+            return res.status(404).json({
+                message: 'Product not found'
+            });
+        }
     },
 
 }
