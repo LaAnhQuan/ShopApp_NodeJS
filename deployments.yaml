@@ -5,7 +5,34 @@ services:
     ports:
       - "3309:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: "" #Blank password
+      MYSQL_ROOT_PASSWORD: "" # Blank password
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: "shopapp_online"
     restart: always
+    networks:
+      - shopapp-online
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-container
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "90:80" # port mapping
+    environment:
+      PMA_HOST: mysql # phpMyAdmin Host, PMA = PHP My Admin
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 500M
+    networks:
+      - shopapp-online
+
+networks:
+  shopapp-online:
+    name: shopapp-online
+    driver: bridge
+
+# Các lệnh Docker Compose để khởi động và dừng các dịch vụ:
+#docker-compose -f ./deployment.yaml up -d phpmyadmin
+#docker-compose -f ./deployment.yaml up -d
+#docker-compose -f ./deployment.yaml down
