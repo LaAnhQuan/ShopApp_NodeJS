@@ -23,19 +23,13 @@ module.exports = {
             });
 
         }
-        try {
-            // console.log(req.body)
-            const product = await db.Product.create(req.body)
-            res.status(201).json({
-                message: 'Insert a product successfully',
-                data: product
-            })
-        } catch (error) {
-            res.status(500).json({
-                message: 'Error when add a product',
-                error
-            })
-        }
+        // console.log(req.body)
+        const product = await db.Product.create(req.body)
+        res.status(201).json({
+            message: 'Insert a product successfully',
+            data: product
+        })
+
     },
 
     deleteProduct: async (req, res) => {
