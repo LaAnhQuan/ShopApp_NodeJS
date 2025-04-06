@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ac3885c8-c144-4bc4-89ab-8903a4ca5971",
+		"_postman_id": "6a3ef463-2285-4c58-bb77-893280e194aa",
 		"name": "ShopAppOnlineNodeJS",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "38253471"
@@ -31,6 +31,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Vivo V27 Pro\",\r\n    \"price\": 22990000,\r\n    \"oldprice\": 24990000,\r\n    \"image\": \"\",\r\n    \"description\": \"Vivo V27 Pro voi camera chinh 50MP, chip MediaTek Dimensity 8200, man hinh AMOLED 6.78 inch mang den anh sang dep.\",\r\n    \"specification\": \"Man hinh AMOLED 6.78 inch, do phan giai 2400x1080; Chipset MediaTek Dimensity 8200; RAM 8GB; Bo nho trong 256GB; Camera sau: chinh 50MP, ultra-wide 8MP, macro 2MP; Camera truoc: 50MP; Pin 4600 mAh voi sac nhanh.\",\r\n    \"buyturn\": 230,\r\n    \"quantity\": 120,\r\n    \"brand_id\": 14,\r\n    \"category_id\": 3\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{API_PREFIX02}}/products",
 							"host": [
@@ -56,6 +65,11 @@
 							"path": [
 								"products",
 								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
 							]
 						}
 					},
@@ -85,13 +99,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_PREFIX02}}/products/3",
+							"raw": "{{API_PREFIX02}}/products/i",
 							"host": [
 								"{{API_PREFIX02}}"
 							],
 							"path": [
 								"products",
-								"3"
+								"i"
 							],
 							"query": [
 								{
@@ -115,12 +129,18 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_PREFIX02}}/categories",
+							"raw": "{{API_PREFIX02}}/categories?search=thoai",
 							"host": [
 								"{{API_PREFIX02}}"
 							],
 							"path": [
 								"categories"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "thoai"
+								}
 							]
 						}
 					},
@@ -131,6 +151,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"may tinh bang\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{API_PREFIX02}}/categories",
 							"host": [
@@ -156,6 +185,11 @@
 							"path": [
 								"categories",
 								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
 							]
 						}
 					},
@@ -215,12 +249,18 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_PREFIX02}}/brands",
+							"raw": "{{API_PREFIX02}}/brands?search=ei",
 							"host": [
 								"{{API_PREFIX02}}"
 							],
 							"path": [
 								"brands"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ei"
+								}
 							]
 						}
 					},
@@ -231,6 +271,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Vivo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{API_PREFIX02}}/brands",
 							"host": [
@@ -256,6 +305,11 @@
 							"path": [
 								"brands",
 								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
 							]
 						}
 					},
@@ -356,6 +410,11 @@
 							"path": [
 								"orders",
 								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
 							]
 						}
 					},
@@ -407,72 +466,78 @@
 			]
 		},
 		{
-			"name": "orderdetails",
+			"name": "order details",
 			"item": [
 				{
-					"name": "api/orderdetails",
+					"name": "api/order-details",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_PREFIX02}}/orderdetails",
+							"raw": "{{API_PREFIX02}}/order-details",
 							"host": [
 								"{{API_PREFIX02}}"
 							],
 							"path": [
-								"orderdetails"
+								"order-details"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "api/orderdetails",
+					"name": "api/order-details",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{API_PREFIX02}}/orderdetails",
+							"raw": "{{API_PREFIX02}}/order-details",
 							"host": [
 								"{{API_PREFIX02}}"
 							],
 							"path": [
-								"orderdetails"
+								"order-details"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "api/orderdetails/:id",
+					"name": "api/order-details/:id",
 					"request": {
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "{{API_PREFIX02}}/orderdetails/:id",
+							"raw": "{{API_PREFIX02}}/order-details/:id",
 							"host": [
 								"{{API_PREFIX02}}"
 							],
 							"path": [
-								"orderdetails",
+								"order-details",
 								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "api/orderdetails/:id",
+					"name": "api/order-details/:id",
 					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{API_PREFIX02}}/orderdetails/3",
+							"raw": "{{API_PREFIX02}}/order-details/3",
 							"host": [
 								"{{API_PREFIX02}}"
 							],
 							"path": [
-								"orderdetails",
+								"order-details",
 								"3"
 							]
 						}
@@ -480,17 +545,17 @@
 					"response": []
 				},
 				{
-					"name": "api/orderdetails/:id",
+					"name": "api/order-details/:id",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_PREFIX02}}/orderdetails/3",
+							"raw": "{{API_PREFIX02}}/order-details/3",
 							"host": [
 								"{{API_PREFIX02}}"
 							],
 							"path": [
-								"orderdetails",
+								"order-details",
 								"3"
 							],
 							"query": [
