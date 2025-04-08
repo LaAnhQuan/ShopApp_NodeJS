@@ -16,11 +16,29 @@ module.exports = {
     },
 
     insertOrder: async (req, res) => {
-        const order = await db.Order.create(req.body);  // Tạo đơn hàng mới từ dữ liệu trong req.body
-        res.status(201).json({
-            message: 'Insert an order successfully',
-            data: order
-        });
+        // Check if the user exists in the database
+        const userExists = await db.User.findByPk(userId);
+        if (!userExists) {
+            // If the user does not exist, return a 404 Not Found error
+            return res.status(404).json({
+                message: 'User does not exist'
+            });
+        }
+
+        // If the user exists, create the order
+        const newOrder = await db.Order.create(req.body);
+        if (newOrder) {
+            res.status(201).json({
+                message: 'New order created successfully',
+                data: newOrder
+            });
+        } else {
+            // Handle cases where the order could not be created
+            res.status(400).json({
+                message: 'Could not create order'
+            });
+        }
+
     },
 
     deleteOrder: async (req, res) => {

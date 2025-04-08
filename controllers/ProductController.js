@@ -63,6 +63,7 @@ module.exports = {
     },
 
     insertProduct: async (req, res) => {
+
         const product = await db.Product.create(req.body)
         res.status(201).json({
             message: 'Insert a product successfully',
