@@ -16,6 +16,7 @@ module.exports = {
     },
 
     insertOrder: async (req, res) => {
+        const userId = req.body.user_id;
         // Check if the user exists in the database
         const userExists = await db.User.findByPk(userId);
         if (!userExists) {
