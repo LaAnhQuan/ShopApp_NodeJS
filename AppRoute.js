@@ -15,6 +15,7 @@ import InsertOrderRequest from './dtos/requests/order/InsertOrderRequest'
 import InsertUserRequest from './dtos/requests/user/InsertUserRequest';
 import InsertNewsRequest from './dtos/requests/news/InsertNewsRequest';
 import InsertNewsDetailRequest from './dtos/requests/newsdetail/InsertNewsDetailRequest';
+import UpdateNewsRequest from './dtos/requests/news/UpdateNewsRequest';
 
 const router = express.Router();
 
@@ -84,7 +85,9 @@ router.get('/news-details/:id', asyncHandler(NewsDetailController.getNewsDetailB
 router.post('/news-details',
     validate(InsertNewsDetailRequest),
     asyncHandler(NewsDetailController.insertNewsDetail));
-router.put('/news-details/:id', asyncHandler(NewsDetailController.updateNewsDetail));
+router.put('/news-details/:id',
+    validate(UpdateNewsRequest),
+    asyncHandler(NewsDetailController.updateNewsDetail));
 router.delete('/news-details/:id', asyncHandler(NewsDetailController.deleteNewsDetail));
 
 

@@ -128,19 +128,40 @@ module.exports = {
         }
     },
     deleteNewsArticle: async (req, res) => {
-        const { id } = req.params;  // Lấy id từ params trong URL
-        const deleted = await db.News.destroy({
-            where: { id }
-        });
+        const { id } = req.params;
+        const transaction = await db.sequelize.transaction(); // Start a transaction
 
-        if (deleted) {
-            res.status(200).json({
-                message: 'Delete a news successfully'
+        try {
+            // First, delete any associated news details
+            await db.NewsDetail.destroy({
+                where: { news_id: id },
+                transaction: transaction // Use the transaction
             });
-        } else {
-            res.status(404).json({
-                message: 'News not found'
+
+            // Then, delete the news article itself
+            const deleted = await db.News.destroy({
+                where: { id },
+                transaction: transaction // Use the transaction
+            });
+
+            if (deleted) {
+                await transaction.commit(); // Commit if everything is okay
+                return res.status(200).json({
+                    message: 'News article deleted successfully'
+                });
+            } else {
+                await transaction.rollback(); // Rollback if article not found
+                return res.status(404).json({
+                    message: 'News article not found'
+                });
+            }
+        } catch (error) {
+            await transaction.rollback(); // Rollback if any error occurs
+            return res.status(500).json({
+                message: 'An error occurred while deleting the news article',
+                error: error.message
             });
         }
+
     },
 }
