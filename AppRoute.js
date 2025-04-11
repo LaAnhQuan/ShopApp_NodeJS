@@ -6,6 +6,7 @@ import * as OrderController from './controllers/OrderController';
 import * as OrderDetailController from './controllers/OrderDetailController';
 import * as UserController from './controllers/UserController';
 import * as NewsController from './controllers/NewsController';
+import * as NewsDetailController from './controllers/NewsDetailController'
 import asyncHandler from './middlewares/asyncHandler';
 import validate from './middlewares/validate';
 import InsertProductRequest from './dtos/requests/product/InsertProductRequest';
@@ -13,6 +14,7 @@ import UpdateProductRequest from './dtos/requests/product/UpdateProductRequest';
 import InsertOrderRequest from './dtos/requests/order/InsertOrderRequest'
 import InsertUserRequest from './dtos/requests/user/InsertUserRequest';
 import InsertNewsRequest from './dtos/requests/news/InsertNewsRequest';
+import InsertNewsDetailRequest from './dtos/requests/newsdetail/InsertNewsDetailRequest';
 
 const router = express.Router();
 
@@ -74,5 +76,16 @@ router.get('/news/:id', asyncHandler(NewsController.getNewsArticleById));
 router.put('/news/:id', asyncHandler(NewsController.updateNewsArticle));
 router.get('/news', asyncHandler(NewsController.getNewsArticles));
 router.delete('/news/:id', asyncHandler(NewsController.deleteNewsArticle));
+
+
+// NewsDetail Routers
+router.get('/news-details', asyncHandler(NewsDetailController.getNewsDetails));
+router.get('/news-details/:id', asyncHandler(NewsDetailController.getNewsDetailById));
+router.post('/news-details',
+    validate(InsertNewsDetailRequest),
+    asyncHandler(NewsDetailController.insertNewsDetail));
+router.put('/news-details/:id', asyncHandler(NewsDetailController.updateNewsDetail));
+router.delete('/news-details/:id', asyncHandler(NewsDetailController.deleteNewsDetail));
+
 
 module.exports = router;
