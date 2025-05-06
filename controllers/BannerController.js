@@ -1,6 +1,8 @@
 import { Model, Sequelize, where } from "sequelize"
 const { Op } = Sequelize
 import db from "../models"
+import path from 'path'
+import fs from 'fs'
 
 
 module.exports = {
@@ -67,6 +69,7 @@ module.exports = {
                 message: "Banner name already exists, please choose a different name"
             })
         }
+
         // If no duplicates, create the new banner
         const banner = await db.Banner.create(req.body);
         return res.status(201).json({
@@ -77,19 +80,27 @@ module.exports = {
 
     updateBanner: async (req, res) => {
         const { id } = req.params;
+        const existingBanner = await db.Banner.findOne({
+            where: {
+                name: req.body.name,
+                id: { [db.Sequelize.Op.ne]: id } // Exclude the current record
+
+            }
+        })
+
+        if (existingBanner) {
+            return res.status(409).json({
+                message: "A banner already exists."
+            })
+        }
+
         const updated = await db.Banner.update(req.body, {
             where: { id }
         });
 
-        if (updated[0] > 0) {
-            return res.status(200).json({
-                message: 'Banner updated successfully',
-            });
-        } else {
-            return res.status(404).json({
-                message: 'Banner not found'
-            });
-        }
+        return res.status(200).json({
+            message: 'Banner updated successfully',
+        });
     },
 
     deleteBanner: async (req, res) => {

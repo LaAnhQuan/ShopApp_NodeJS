@@ -87,20 +87,29 @@ module.exports = {
 
 
     updateBrand: async (req, res) => {
-        const brandId = req.params.id;  // Lấy id của thương hiệu từ URL
+        const { id } = req.params;  // Lấy id của thương hiệu từ URL
+        const { name } = req.body;
+        //check another category with the same and a different ID
+        const existingBrand = await db.Brand.findOne({
+            where: {
+                name: name,
+                id: { [db.Sequelize.Op.ne]: id } // Exclude the current category from the check
+            }
+        })
+        if (existingBrand) {
+            //If a duplicate is found, return an error response
+            return res.status(400).json({
+                message: "The Brand is exists, please choose different name"
+            })
+        }
+
         const updatedBrand = await db.Brand.update(req.body, {
-            where: { id: brandId }
+            where: { id }
         });
 
-        if (updatedBrand[0] > 0) {  // Sequelize `update` trả về mảng với phần tử đầu tiên là số dòng bị ảnh hưởng
-            return res.status(200).json({
-                message: 'Brand updated successfully',
-            });
-        } else {
-            return res.status(404).json({
-                message: 'Brand not found'
-            });
-        }
+        return res.status(200).json({
+            message: 'Brand updated successfully',
+        });
     }
 
 }

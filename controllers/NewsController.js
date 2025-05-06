@@ -112,20 +112,28 @@ module.exports = {
         }
     },
     updateNewsArticle: async (req, res) => {
-        const { id } = req.params;  // Lấy id của danh mục từ params
+        const { id } = req.params;
+        const { title } = req.body;
+        // Check if another article exists with the same title but a different ID
+        const existingArticle = await db.News.findOne({
+            where: {
+                title: title,
+                id: { [db.Sequelize.Op.ne]: id } // Exclude the current article from check
+            }
+        });
+
+        if (existingArticle) {
+            return res.status(400).json({
+                message: 'An article with this title already exists. Please choose a different title.'
+            });
+        }
         const updateNewsArticle = await db.News.update(req.body, {
             where: { id }
         });
 
-        if (updateNewsArticle[0] > 0) {  // Sequelize `update` trả về mảng với phần tử đầu tiên là số dòng bị ảnh hưởng
-            return res.status(200).json({
-                message: 'News updated successfully',
-            });
-        } else {
-            return res.status(404).json({
-                message: 'News not found'
-            });
-        }
+        return res.status(200).json({
+            message: 'News updated successfully',
+        });
     },
     deleteNewsArticle: async (req, res) => {
         const { id } = req.params;

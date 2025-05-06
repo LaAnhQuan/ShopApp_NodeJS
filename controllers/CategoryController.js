@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize"
+import { Sequelize, where } from "sequelize"
 const { Op } = Sequelize
 import db from "../models"
 
@@ -93,19 +93,29 @@ module.exports = {
     },
 
     updateCategory: async (req, res) => {
-        const categoryId = req.params.id;  // Lấy id của danh mục từ params
+        const { id } = req.params;
+        const { name } = req.body;  // Lấy id của danh mục từ params
+
+        //check another category with the same and a different ID
+        const existingCategory = await db.Category.findOne({
+            where: {
+                name: name,
+                id: { [db.Sequelize.Op.ne]: id } // Exclude the current category from the check
+            }
+        })
+        if (existingCategory) {
+            //If a duplicate is found, return an error response
+            return res.status(400).json({
+                message: "The Category is exists, please choose different name"
+            })
+        }
+
         const updatedCategory = await db.Category.update(req.body, {
-            where: { id: categoryId }
+            where: { id }
         });
 
-        if (updatedCategory[0] > 0) {  // Sequelize `update` trả về mảng với phần tử đầu tiên là số dòng bị ảnh hưởng
-            return res.status(200).json({
-                message: 'Category updated successfully',
-            });
-        } else {
-            return res.status(404).json({
-                message: 'Category not found'
-            });
-        }
+        return res.status(200).json({
+            message: 'Category updated successfully',
+        });
     }
 }

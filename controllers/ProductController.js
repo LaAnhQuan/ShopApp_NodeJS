@@ -89,9 +89,23 @@ module.exports = {
     },
 
     updateProduct: async (req, res) => {
-        const productId = req.params.id;
+        const { id } = req.params;
+        const { name } = req.body;
+        const existingProduct = await db.Product.findOne({
+            where: {
+                name: name,
+                id: { [db.Sequelize.Op.ne]: id }
+            }
+        });
+
+        if (existingProduct) {
+            return res.status(400).json({
+                message: 'A product with this name already exists. Please choose a different name.'
+            });
+        }
+
         const updatedProduct = await db.Product.update(req.body, {
-            where: { id: productId }
+            where: { id }
         });
 
 
