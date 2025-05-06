@@ -130,8 +130,10 @@ router.post('/banner-details',
 router.put('/banner-details/:id', asyncHandler(BannerDetailController.updateBannerDetail))
 router.delete('/banner-details/:id', asyncHandler(BannerDetailController.deleteBannerDetail))
 
+
 router.post('/images/upload',
     uploadImageMiddleware.array('images', 5), //max 5 photo
-    asyncHandler(ImageController.uploadImages)),
-    router.get('/images/:fileName', asyncHandler(ImageController.viewImage))
+    asyncHandler(ImageController.uploadImages))
+router.delete('/images/delete', ImageController.deleteImage)
+router.get('/images/:fileName', asyncHandler(ImageController.viewImage))
 module.exports = router
