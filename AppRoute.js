@@ -9,6 +9,7 @@ import * as NewsController from './controllers/NewsController'
 import * as NewsDetailController from './controllers/NewsDetailController'
 import * as BannerController from './controllers/BannerController'
 import * as BannerDetailController from './controllers/BannerDetailController'
+import * as ImageController from './controllers/ImageController'
 import asyncHandler from './middlewares/asyncHandler'
 import validate from './middlewares/validate'
 import InsertProductRequest from './dtos/requests/product/InsertProductRequest'
@@ -20,6 +21,7 @@ import InsertNewsDetailRequest from './dtos/requests/newsdetail/InsertNewsDetail
 import UpdateNewsRequest from './dtos/requests/news/UpdateNewsRequest'
 import InsertBannerRequest from './dtos/requests/banner/InsertBannerRequest'
 import InsertBannerDetailRequest from './dtos/requests/banner-detail/InsertBannerDetailRequest'
+import uploadImageMiddleware from './middlewares/imageUpload'
 const router = express.Router()
 
 
@@ -110,5 +112,9 @@ router.post('/banner-details',
     asyncHandler(BannerDetailController.insertBannerDetail))
 router.put('/banner-details/:id', asyncHandler(BannerDetailController.updateBannerDetail))
 router.delete('/banner-details/:id', asyncHandler(BannerDetailController.deleteBannerDetail))
+
+router.post('/images/upload',
+    uploadImageMiddleware.array('images', 5), //max 5 photo
+    asyncHandler(ImageController.uploadImages))
 
 module.exports = router
