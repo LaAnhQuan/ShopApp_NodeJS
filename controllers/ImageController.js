@@ -65,7 +65,7 @@ module.exports = {
             // check if the image URL is still in use in any of the database tables 
             const isInUse = await checkImageInUse(url);
             if (isInUse) {
-                res.status(500).json({
+                return res.status(500).json({
                     message: 'Image still using in database'
                 });
             }

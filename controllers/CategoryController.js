@@ -97,17 +97,21 @@ module.exports = {
         const { name } = req.body;  // Lấy id của danh mục từ params
 
         //check another category with the same and a different ID
-        const existingCategory = await db.Category.findOne({
-            where: {
-                name: name,
-                id: { [db.Sequelize.Op.ne]: id } // Exclude the current category from the check
-            }
-        })
-        if (existingCategory) {
-            //If a duplicate is found, return an error response
-            return res.status(400).json({
-                message: "The Category is exists, please choose different name"
+        if (name !== undefined) {
+            const existingCategory = await db.Category.findOne({
+                where: {
+                    name: name,
+                    id: { [db.Sequelize.Op.ne]: id } // Exclude the current category from the check
+                }
             })
+
+
+            if (existingCategory) {
+                //If a duplicate is found, return an error response
+                return res.status(400).json({
+                    message: "The Category is exists, please choose different name"
+                })
+            }
         }
 
         const updatedCategory = await db.Category.update(req.body, {
