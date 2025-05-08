@@ -46,8 +46,11 @@ module.exports = {
 
     getProductById: async (req, res) => {
         const { id } = req.params;  // Lấy id từ params trong URL
-        const product = await db.Product.findOne({
-            where: { id }  // Tìm sản phẩm có id tương ứng
+        const product = await db.Product.findByPk(id, {
+            include: [{
+                model: db.ProductImage, // Su dung ten model dung dinh nghia trong associations
+                as: 'product_images' // Đảm bảo rằng đã khai báo 'as' trong mối quan hệ associations nếu có 
+            }]
         });
 
         if (product) {

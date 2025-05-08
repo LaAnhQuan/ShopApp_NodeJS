@@ -7,27 +7,39 @@ import { error } from 'console'
 import path from 'path'
 import fs from 'fs'
 import db from '../models';
+import { Sequelize } from "sequelize";
 
 const checkImageInUse = async (imageUrl) => {
-    const models = [
-        db.Category,
-        db.Brand,
-        db.Product,
-        db.News,
-        db.Banner
-    ];
+    const modelFields = {
+        User: 'avatar',     // Trường `avatar` cho User
+        Category: 'image',
+        Brand: 'image',
+        Product: 'image',
+        News: 'image',
+        Banner: 'image',
+        ProductImage: 'image_url'
+    };
 
-    for (const model of models) {
-        const result = await model.findOne({
-            where: { image: imageUrl }
-        });
+    const models = [db.User, db.Category, db.Brand, db.Product, db.News, db.Banner, db.ProductImage];
 
+    // Duyệt qua từng model
+    for (let model of models) {
+        // Lấy tên trường tương ứng từ đối tượng modelFields
+        const fieldName = modelFields[model.name];
+
+        // Tạo đối tượng truy vấn dựa trên tên trường
+        let query = {};
+        query[fieldName] = imageUrl;
+
+        // Tìm bản ghi với điều kiện truy vấn
+        const result = await model.findOne({ where: query });
         if (result) {
-            return true;
+            console.log(`Found in model :  ${model.name}, Field: ${fieldName}, Image URL: ${imageUrl}`)
+            return true; // Nếu tìm thấy bản ghi, trả về true
         }
     }
 
-    return false;
+    return false; // Nếu không tìm thấy bản ghi nào, trả về false
 };
 module.exports = {
     uploadImages: async (req, res) => {
