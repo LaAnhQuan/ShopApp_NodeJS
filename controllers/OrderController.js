@@ -10,9 +10,25 @@ module.exports = {
     },
 
     getOrderById: async (req, res) => {
+        const { id } = req.params;
+        const order = await db.Order.findByPk(id, {
+            include: [{
+                model: db.OrderDetail,
+                as: 'order_details' // 'orderDetails' should match the alias used in the association
+            }]
+        });
+
+        if (!order) {
+            return res.status(404).json({
+                message: 'Order not found'
+            });
+        }
+
         res.status(200).json({
-            message: 'Get an order successfully'
-        })
+            message: 'Order information retrieved successfully',
+            data: order
+        });
+
     },
 
     insertOrder: async (req, res) => {

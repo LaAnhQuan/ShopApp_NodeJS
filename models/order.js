@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'user_id'
       });
       Order.hasMany(models.OrderDetail, {
-        foreignKey: 'order_id'
+        foreignKey: 'order_id',
+        as: 'order_details'
       })
     }
   }
@@ -23,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
     user_id: DataTypes.INTEGER,
     status: DataTypes.INTEGER,
     note: DataTypes.TEXT,
-    total: DataTypes.INTEGER
+    total: DataTypes.INTEGER,
+    session_id: DataTypes.TEXT,
   }, {
     sequelize,
     modelName: 'Order',

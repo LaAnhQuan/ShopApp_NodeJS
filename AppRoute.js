@@ -103,21 +103,23 @@ router.put('/order-details/:id', asyncHandler(OrderDetailController.updateOrderD
 router.delete('/order-details/:id', asyncHandler(OrderDetailController.deleteOrderDetail))
 
 // Cart Routes
-router.get('/carts',
-    validate(InsertCartRequest),
-    asyncHandler(CartController.getCarts));
+router.get('/carts', asyncHandler(CartController.getCarts));
 router.get('/carts/:id', asyncHandler(CartController.getCartById));
-router.post('/carts', asyncHandler(CartController.insertCart));
+router.post('/carts',
+    validate(InsertCartRequest),
+    asyncHandler(CartController.insertCart));
+router.post('/carts/checkout', asyncHandler(CartController.checkoutCart));
 // router.put('/carts/:id', asyncHandler(CartController.updateCart));
 router.delete('/carts/:id', asyncHandler(CartController.deleteCart));
 
 
 // CartItem Routes
-router.get('/cart-items',
-    validate(InsertCartItemRequest),
-    asyncHandler(CartItemController.getCartItems));
+router.get('/cart-items', asyncHandler(CartItemController.getCartItems));
 router.get('/cart-items/:id', asyncHandler(CartItemController.getCartItemById));
-router.post('/cart-items', asyncHandler(CartItemController.insertCartItem));
+router.get('/cart-items/carts/:cart_id', asyncHandler(CartItemController.getCartItemsByCartId));
+router.post('/cart-items',
+    validate(InsertCartItemRequest),
+    asyncHandler(CartItemController.insertCartItem));
 router.put('/cart-items/:id', asyncHandler(CartItemController.updateCartItem));
 router.delete('/cart-items/:id', asyncHandler(CartItemController.deleteCartItem));
 
