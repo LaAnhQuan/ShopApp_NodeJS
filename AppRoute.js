@@ -23,6 +23,7 @@ import UpdateProductRequest from './dtos/requests/product/UpdateProductRequest'
 import InsertOrderRequest from './dtos/requests/order/InsertOrderRequest'
 import UpdateOrderRequest from './dtos/requests/order/UpdateOrderRequest'
 import InsertUserRequest from './dtos/requests/user/InsertUserRequest'
+import LoginUserRequest from './dtos/requests/user/LoginUserRequest'
 import InsertNewsRequest from './dtos/requests/news/InsertNewsRequest'
 import InsertNewsDetailRequest from './dtos/requests/newsdetail/InsertNewsDetailRequest'
 import UpdateNewsRequest from './dtos/requests/news/UpdateNewsRequest'
@@ -36,9 +37,12 @@ const router = express.Router()
 
 
 // User Routes
-router.post('/users',
+router.post('/users/register',
     validate(InsertUserRequest),
-    asyncHandler(UserController.insertUser))
+    asyncHandler(UserController.registerUser))
+router.post('/users/login',
+    validate(LoginUserRequest),
+    asyncHandler(UserController.login))
 router.put('/users/:id', asyncHandler(UserController.updateUser))
 
 // Product Routes

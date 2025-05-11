@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { UserRole } from "../../../constants";
 //import bcrypt from 'bcryptjs'; // Assuming bcrypt is used for encrypting the password
 
 class InsertUserRequest {
@@ -20,10 +21,9 @@ class InsertUserRequest {
 
     static validate(data) {
         const schema = Joi.object({
-            email: Joi.string().email().required(),
-            password: Joi.string().min(6).required(), // Ensure password has a minimum length
+            email: Joi.string().email().optional(),
+            password: Joi.string().min(6).optional(), // optional(Login Facebook, Google)
             name: Joi.string().required(),
-            role: Joi.number().integer().min(1).required(), // Ensure role is a positive integer
             avatar: Joi.string().uri().allow('').optional(), // Optional and must be a valid URL
             phone: Joi.string().optional() // Optional field for phone numbers
         });

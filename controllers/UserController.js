@@ -4,31 +4,92 @@ import db from "../models"
 import InsertUserRequest from "../dtos/requests/user/InsertUserRequest";
 import ResponseUser from "../dtos/responses/user/ResponseUser";
 import * as argon2 from "argon2";
+import { UserRole } from "../constants";
 
 module.exports = {
-    insertUser: async (req, res) => {
-        const existingUser = await db.User.findOne({ where: { email: req.body.email } });
+    registerUser: async (req, res) => {
+        const { email, phone, password } = req.body;
+        // Validate that either email or phone is provided
+        if (!email && !phone) {
+            return res.status(400).json({
+                message: 'Please provide email or phone number'
+            })
+        }
+        // Check for existing user by email or phone
+        const condition = {};
+        if (email) condition.email = email;
+        if (phone) condition.phone = phone;
+
+        const existingUser = await db.User.findOne({ where: condition });
         if (existingUser) {
-            return res.status(409).json({ // 409 Conflict is often used for duplicate resource creation attempts
-                message: 'Email already exists'
+            return res.status(409).json({
+                message: 'Email or phone number already exists'
             });
         }
-        const hashedPassword = await argon2.hash(req.body.password)
+        const hashedPassword = password ? await argon2.hash(password) : null;
+        // Create user 
         const user = await db.User.create({
             ...req.body,
-            password: hashedPassword
+            email,
+            phone,
+            role: UserRole.User,
+            password: hashedPassword,
+
         })
-        if (user) {
-            return res.status(201).json({
-                message: 'Insert a user successfully',
-                data: new ResponseUser(user)
-            })
-        } else {
+        return res.status(201).json({
+            message: 'Register a user successfully',
+            data: new ResponseUser(user)
+        })
+
+    },
+
+    login: async (req, res) => {
+        const { email, phone, password } = req.body;
+
+        // Validate that either email or phone is provided
+        if (!email && !phone) {
             return res.status(400).json({
-                message: 'Failed to insert user',
-                data: user
-            })
+                message: 'Email or phone number is required'
+            });
         }
+
+        // Check for existing user by email or phone
+        const condition = {};
+        if (email) condition.email = email;
+        if (phone) condition.phone = phone;
+
+        const user = await db.User.findOne({ where: condition });
+        if (!user) {
+            return res.status(404).json({
+                message: 'Incorrect name or password '
+            });
+        }
+
+        // Verify the password
+        const passwordValid = password && await argon2.verify(user.password, password);
+        if (!passwordValid) {
+            return res.status(401).json({
+                message: 'Incorrect name or password '
+            });
+        }
+
+        // Generate a JWT token
+        /*
+        const token = jwt.sign(
+            { id: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+        */
+
+        // Return user information and token
+        return res.status(200).json({
+            message: 'Login successful',
+            data: {
+                user: new ResponseUser(user),
+                //token
+            }
+        });
 
     },
 
