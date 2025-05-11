@@ -21,6 +21,7 @@ import validate from './middlewares/validate'
 import InsertProductRequest from './dtos/requests/product/InsertProductRequest'
 import UpdateProductRequest from './dtos/requests/product/UpdateProductRequest'
 import InsertOrderRequest from './dtos/requests/order/InsertOrderRequest'
+import UpdateOrderRequest from './dtos/requests/order/UpdateOrderRequest'
 import InsertUserRequest from './dtos/requests/user/InsertUserRequest'
 import InsertNewsRequest from './dtos/requests/news/InsertNewsRequest'
 import InsertNewsDetailRequest from './dtos/requests/newsdetail/InsertNewsDetailRequest'
@@ -88,11 +89,14 @@ router.delete('/brands/:id', asyncHandler(BrandController.deleteBrand))
 // Order Routes
 router.get('/orders', asyncHandler(OrderController.getOrders))
 router.get('/orders/:id', asyncHandler(OrderController.getOrderById))
+/*
 router.post('/orders',
     validate(InsertOrderRequest),
-    asyncHandler(OrderController.insertOrder)
-)
-router.put('/orders/:id', asyncHandler(OrderController.updateOrder))
+    asyncHandler(OrderController.insertOrder))
+*/
+router.put('/orders/:id',
+    validate(UpdateOrderRequest),
+    asyncHandler(OrderController.updateOrder))
 router.delete('/orders/:id', asyncHandler(OrderController.deleteOrder))
 
 // OrderDetail Routes

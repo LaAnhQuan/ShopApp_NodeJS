@@ -1,12 +1,44 @@
-import { Sequelize } from "sequelize"
+import { Sequelize, where } from "sequelize"
 const { Op } = Sequelize
 import db from "../models"
+import { OrderStatus } from "../constants"
 
 module.exports = {
     getOrders: async (req, res) => {
-        res.status(200).json({
-            message: 'Get orders successfully'
-        })
+        const { search = '', page = 1, status } = req.query;
+        const pageSize = 5;
+        const offset = (page - 1) * pageSize;
+
+        let whereClause = {};
+        if (search.trim() !== '') {
+            whereClause = {
+                [Op.or]: [
+                    { note: { [Op.like]: `%${search}%` } },
+                ]
+            };
+        }
+
+        if (status) {
+            whereClause.status = status;
+        }
+
+        const [orders, totalOrders] = await Promise.all([
+            db.Order.findAll({
+                where: whereClause,
+                limit: pageSize,
+                offset: offset,
+                order: [['created_at', 'DESC']]
+            }),
+            db.Order.count({ where: whereClause })
+        ]);
+
+        return res.status(200).json({
+            message: 'Fetched orders successfully',
+            data: orders,
+            currentPage: parseInt(page, 10),
+            totalPages: Math.ceil(totalOrders / pageSize),
+            totalOrders
+        });
     },
 
     getOrderById: async (req, res) => {
@@ -31,6 +63,7 @@ module.exports = {
 
     },
 
+    /*
     insertOrder: async (req, res) => {
         const userId = req.body.user_id;
         // Check if the user exists in the database
@@ -57,14 +90,17 @@ module.exports = {
         }
 
     },
+    */
 
     deleteOrder: async (req, res) => {
         const { id } = req.params;  // Lấy id của đơn hàng từ URL
-        const deleted = await db.Order.destroy({
+
+        // Cập nhật trạng thái đơn hàng sang FAILED thay vì xóa
+        const [updated] = await db.Order.update({ status: OrderStatus.FAILED }, {
             where: { id }
         });
 
-        if (deleted) {
+        if (updated) {
             res.status(200).json({
                 message: 'Delete an order successfully'
             });

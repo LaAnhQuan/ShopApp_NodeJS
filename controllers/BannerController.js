@@ -1,9 +1,7 @@
 import { Model, Sequelize, where } from "sequelize"
 const { Op } = Sequelize
 import db from "../models"
-import path from 'path'
-import fs from 'fs'
-
+import { BannerStatus } from "../constants"
 
 module.exports = {
     getBanners: async (req, res) => {
@@ -70,8 +68,13 @@ module.exports = {
             })
         }
 
+        const bannerData = {
+            ...req.body,
+            status: BannerStatus.ACTIVE
+        }
+
         // If no duplicates, create the new banner
-        const banner = await db.Banner.create(req.body);
+        const banner = await db.Banner.create(bannerData);
         return res.status(201).json({
             message: 'Banner added successfully!',
             data: banner

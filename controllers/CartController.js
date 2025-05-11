@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 const { Op } = Sequelize;
 import db from "../models";
+import { OrderStatus } from "../constants";
 
 module.exports = {
     getCarts: async (req, res) => {
@@ -119,6 +120,7 @@ module.exports = {
                 {
                     user_id: cart.user_id, // assuming cart model has user_id
                     session_id: cart.session_id, // assuming cart model has session_id
+                    status: OrderStatus.PENDING,
                     total: total || cart.cart_items.reduce((acc, item) => acc + item.quantity * item.product.price, 0),
                     note: note,
                 },
