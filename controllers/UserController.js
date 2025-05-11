@@ -5,6 +5,9 @@ import InsertUserRequest from "../dtos/requests/user/InsertUserRequest";
 import ResponseUser from "../dtos/responses/user/ResponseUser";
 import * as argon2 from "argon2";
 import { UserRole } from "../constants";
+import jwt from 'jsonwebtoken'
+require('dotenv').config();
+
 
 module.exports = {
     registerUser: async (req, res) => {
@@ -74,20 +77,23 @@ module.exports = {
         }
 
         // Generate a JWT token
-        /*
+
         const token = jwt.sign(
-            { id: user.id, role: user.role },
+            {
+                id: user.id, //most important
+                //role: user.role
+            },
             process.env.JWT_SECRET,
-            { expiresIn: '24h' }
+            { expiresIn: process.env.JWT_EXPIRATION }
         );
-        */
+
 
         // Return user information and token
         return res.status(200).json({
             message: 'Login successful',
             data: {
                 user: new ResponseUser(user),
-                //token
+                token
             }
         });
 

@@ -60,19 +60,12 @@ module.exports = {
     },
 
     insertCategory: async (req, res) => {
-        try {
-            // console.log(req.body)
-            const category = await db.Category.create(req.body);
-            res.status(201).json({
-                message: 'Insert a category successfully',
-                data: category
-            });
-        } catch (error) {
-            res.status(500).json({
-                message: 'Error when add a category',
-                error: error.message
-            });
-        }
+        // console.log(req.body)
+        const category = await db.Category.create(req.body);
+        res.status(201).json({
+            message: 'Insert a category successfully',
+            data: category
+        });
     },
 
     deleteCategory: async (req, res) => {

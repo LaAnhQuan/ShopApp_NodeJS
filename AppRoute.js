@@ -33,6 +33,9 @@ import InsertProductImageRequest from './dtos/requests/product_images/InsertProd
 import uploadImageMiddleware from './middlewares/imageUpload'
 import InsertCartItemRequest from './dtos/requests/cart_item/InsertCartItemRequest'
 import InsertCartRequest from './dtos/requests/cart/InsertCartRequest'
+
+import { requireRoles } from './middlewares/jwtMiddleware'
+import { UserRole } from './constants'
 const router = express.Router()
 
 
@@ -49,20 +52,25 @@ router.put('/users/:id', asyncHandler(UserController.updateUser))
 router.get('/products', asyncHandler(ProductController.getProducts))
 router.get('/products/:id', asyncHandler(ProductController.getProductById))
 router.post('/products',
+    requireRoles([UserRole.Admin]),
     validateImageExists,
     validate(InsertProductRequest),
     asyncHandler(ProductController.insertProduct)
 )
 router.put('/products/:id',
+    requireRoles([UserRole.Admin]),
     validateImageExists,
     validate(UpdateProductRequest),
     asyncHandler(ProductController.updateProduct))
-router.delete('/products/:id', asyncHandler(ProductController.deleteProduct))
+router.delete('/products/:id',
+    requireRoles([UserRole.Admin]),
+    asyncHandler(ProductController.deleteProduct))
 
 // ProductImage Routes
 router.get('/product-images', asyncHandler(ProductImageController.getProductImages));
 router.get('/product-images/:id', asyncHandler(ProductImageController.getProductImageById));
 router.post('/product-images',
+    requireRoles([UserRole.Admin]),
     validate(InsertProductImageRequest),
     asyncHandler(ProductImageController.insertProductImage));
 router.delete('/product-images/:id', asyncHandler(ProductImageController.deleteProductImage));
@@ -72,12 +80,16 @@ router.delete('/product-images/:id', asyncHandler(ProductImageController.deleteP
 router.get('/categories', asyncHandler(CategoryController.getCategories))
 router.get('/categories/:id', asyncHandler(CategoryController.getCategoryById))
 router.post('/categories',
+    requireRoles([UserRole.Admin]),
     validateImageExists,
     asyncHandler(CategoryController.insertCategory))
 router.put('/categories/:id',
+    requireRoles([UserRole.Admin]),
     validateImageExists,
     asyncHandler(CategoryController.updateCategory))
-router.delete('/categories/:id', asyncHandler(CategoryController.deleteCategory))
+router.delete('/categories/:id',
+    requireRoles([UserRole.Admin]),
+    asyncHandler(CategoryController.deleteCategory))
 
 // Brand Routes
 router.get('/brands', asyncHandler(BrandController.getBrands))
@@ -86,9 +98,12 @@ router.post('/brands',
     validateImageExists,
     asyncHandler(BrandController.insertBrand))
 router.put('/brands/:id',
+    requireRoles([UserRole.Admin]),
     validateImageExists,
     asyncHandler(BrandController.updateBrand))
-router.delete('/brands/:id', asyncHandler(BrandController.deleteBrand))
+router.delete('/brands/:id',
+    requireRoles([UserRole.Admin]),
+    asyncHandler(BrandController.deleteBrand))
 
 // Order Routes
 router.get('/orders', asyncHandler(OrderController.getOrders))
@@ -101,24 +116,34 @@ router.post('/orders',
 router.put('/orders/:id',
     validate(UpdateOrderRequest),
     asyncHandler(OrderController.updateOrder))
-router.delete('/orders/:id', asyncHandler(OrderController.deleteOrder))
+router.delete('/orders/:id',
+    requireRoles([UserRole.Admin, UserRole.User]),
+    requireRoles([UserRole.Admin]),
+    asyncHandler(OrderController.deleteOrder))
 
 // OrderDetail Routes
 router.get('/order-details', asyncHandler(OrderDetailController.getOrderDetails))
 router.get('/order-details/:id', asyncHandler(OrderDetailController.getOrderDetailById))
-router.post('/order-details', asyncHandler(OrderDetailController.insertOrderDetail))
+router.post('/order-details',
+    requireRoles([UserRole.Admin]),
+    asyncHandler(OrderDetailController.insertOrderDetail))
 router.put('/order-details/:id', asyncHandler(OrderDetailController.updateOrderDetail))
-router.delete('/order-details/:id', asyncHandler(OrderDetailController.deleteOrderDetail))
+router.delete('/order-details/:id',
+    requireRoles([UserRole.Admin]),
+    asyncHandler(OrderDetailController.deleteOrderDetail))
 
 // Cart Routes
 router.get('/carts', asyncHandler(CartController.getCarts));
 router.get('/carts/:id', asyncHandler(CartController.getCartById));
 router.post('/carts',
+    requireRoles([UserRole.Admin]),
     validate(InsertCartRequest),
     asyncHandler(CartController.insertCart));
 router.post('/carts/checkout', asyncHandler(CartController.checkoutCart));
 // router.put('/carts/:id', asyncHandler(CartController.updateCart));
-router.delete('/carts/:id', asyncHandler(CartController.deleteCart));
+router.delete('/carts/:id',
+    requireRoles([UserRole.User]),
+    asyncHandler(CartController.deleteCart));
 
 
 // CartItem Routes
@@ -126,19 +151,26 @@ router.get('/cart-items', asyncHandler(CartItemController.getCartItems));
 router.get('/cart-items/:id', asyncHandler(CartItemController.getCartItemById));
 router.get('/cart-items/carts/:cart_id', asyncHandler(CartItemController.getCartItemsByCartId));
 router.post('/cart-items',
+    requireRoles([UserRole.User]),
     validate(InsertCartItemRequest),
     asyncHandler(CartItemController.insertCartItem));
-router.put('/cart-items/:id', asyncHandler(CartItemController.updateCartItem));
-router.delete('/cart-items/:id', asyncHandler(CartItemController.deleteCartItem));
+router.put('/cart-items/:id',
+    requireRoles([UserRole.User]),
+    asyncHandler(CartItemController.updateCartItem));
+router.delete('/cart-items/:id',
+    requireRoles([UserRole.User, UserRole.Admin]),
+    asyncHandler(CartItemController.deleteCartItem));
 
 
 // News Routes
 router.post('/news',
+    requireRoles([UserRole.Admin, UserRole.User]),
     validateImageExists,
     validate(InsertNewsRequest),
     asyncHandler(NewsController.insertNewsArticle))
 router.get('/news/:id', asyncHandler(NewsController.getNewsArticleById))
 router.put('/news/:id',
+    requireRoles([UserRole.Admin, UserRole.User]),
     validateImageExists,
     asyncHandler(NewsController.updateNewsArticle))
 router.get('/news', asyncHandler(NewsController.getNewsArticles))
@@ -149,38 +181,52 @@ router.delete('/news/:id', asyncHandler(NewsController.deleteNewsArticle))
 router.get('/news-details', asyncHandler(NewsDetailController.getNewsDetails))
 router.get('/news-details/:id', asyncHandler(NewsDetailController.getNewsDetailById))
 router.post('/news-details',
+    requireRoles([UserRole.Admin, UserRole.User]),
     validate(InsertNewsDetailRequest),
     asyncHandler(NewsDetailController.insertNewsDetail))
 router.put('/news-details/:id',
+    requireRoles([UserRole.Admin, UserRole.User]),
     validate(UpdateNewsRequest),
     asyncHandler(NewsDetailController.updateNewsDetail))
-router.delete('/news-details/:id', asyncHandler(NewsDetailController.deleteNewsDetail))
+router.delete('/news-details/:id',
+    requireRoles([UserRole.Admin]),
+    asyncHandler(NewsDetailController.deleteNewsDetail))
 
 // Banner Routes
 router.get('/banners', asyncHandler(BannerController.getBanners))
 router.get('/banners/:id', asyncHandler(BannerController.getBannerById))
 router.post('/banners',
+    requireRoles([UserRole.Admin]),
     validate(InsertBannerRequest),
     validateImageExists,
     asyncHandler(BannerController.insertBanner))
 router.put('/banners/:id',
+    requireRoles([UserRole.Admin]),
     validateImageExists,
     asyncHandler(BannerController.updateBanner))
-router.delete('/banners/:id', asyncHandler(BannerController.deleteBanner))
+router.delete('/banners/:id',
+    requireRoles([UserRole.Admin]),
+    asyncHandler(BannerController.deleteBanner))
 
 // BannerDetail Routes
 router.get('/banner-details', asyncHandler(BannerDetailController.getBannerDetails))
 router.get('/banner-details/:id', asyncHandler(BannerDetailController.getBannerDetailById))
 router.post('/banner-details',
+    requireRoles([UserRole.Admin]),
     validate(InsertBannerDetailRequest),
     asyncHandler(BannerDetailController.insertBannerDetail))
 router.put('/banner-details/:id', asyncHandler(BannerDetailController.updateBannerDetail))
-router.delete('/banner-details/:id', asyncHandler(BannerDetailController.deleteBannerDetail))
+router.delete('/banner-details/:id',
+    requireRoles([UserRole.Admin]),
+    asyncHandler(BannerDetailController.deleteBannerDetail))
 
-
+//Image Routes
 router.post('/images/upload',
+    requireRoles([UserRole.Admin, UserRole.User]),
     uploadImageMiddleware.array('images', 5), //max 5 photo
     asyncHandler(ImageController.uploadImages))
-router.delete('/images/delete', ImageController.deleteImage)
+router.delete('/images/delete',
+    requireRoles([UserRole.Admin, UserRole.User]),
+    ImageController.deleteImage)
 router.get('/images/:fileName', asyncHandler(ImageController.viewImage))
 module.exports = router
