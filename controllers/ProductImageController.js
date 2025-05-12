@@ -29,7 +29,11 @@ module.exports = {
 
         return res.status(200).json({
             message: 'Get product images successfully',
-            data: productImages,
+            // data: productImages,
+            data: productImages.map(productImage => ({
+                ...productImage.get({ plain: true }),
+                image_url: getAvatarURL(productImage.image_url)
+            })),
             currentPage: page,
             totalPages: Math.ceil(totalProductImages / pageSize),
             totalProductImages
@@ -48,8 +52,12 @@ module.exports = {
 
         res.status(200).json({
             message: "Get product image successfully",
-            data: productImage
+            data: {
+                ...productImage.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
+                image_url: getAvatarURL(productImage.image_url) // Định dạng URL của ảnh
+            }
         });
+
     },
 
     insertProductImage: async (req, res) => {
@@ -80,8 +88,12 @@ module.exports = {
         const productImage = await db.ProductImage.create(req.body);
         res.status(201).json({
             message: "Insert product image successfully",
-            data: productImage
+            data: {
+                ...productImage.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
+                image_url: getAvatarURL(productImage.image_url) // Định dạng URL của ảnh
+            }
         });
+
 
     },
 

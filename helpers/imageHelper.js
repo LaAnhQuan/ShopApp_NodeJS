@@ -7,9 +7,15 @@ import os from 'os';
  * @returns {string} The full URL to the user's avatar.
  */
 export const getAvatarURL = (imageName) => {
-    if (imageName && !imageName.includes('http')) {
+    // Kiểm tra nếu imageName không có giá trị hoặc là một chuỗi rỗng
+    if (!imageName) {
+        return "";
+    }
+    // Nếu avatar không phải là một URL HTTP và có giá trị, nối nó với API_PREFIX để tạo URL đầy đủ
+    if (!imageName.includes('http')) {
         const API_PREFIX = `http://${os.hostname()}:${process.env.PORT || 3000}/api`;
         return `${API_PREFIX}/images/${imageName}`;
     }
+    // Nếu imageName là một URL HTTP, trả về nguyên vẹn
     return imageName;
 };

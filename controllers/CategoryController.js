@@ -36,11 +36,15 @@ module.exports = {
         // Send the response
         return res.status(200).json({
             message: 'Get categories successfully',
-            data: categories,
+            data: categories.map(category => ({
+                ...category.get({ plain: true }), // Convert Sequelize instance to plain object
+                image: getAvatarURL(category.image) // Format image URL
+            })),
             currentPage: parseInt(page, 10),
             totalPages: Math.ceil(totalCategories / pageSize),
-            totalCategories
+            totalCategories: totalCategories
         });
+
     },
 
 
@@ -56,8 +60,12 @@ module.exports = {
         }
         res.status(200).json({
             message: 'Get a category successfully',
-            data: category
-        })
+            data: {
+                ...category.get({ plain: true }), // Convert Sequelize instance to plain object
+                image: getAvatarURL(category.image) // Format image URL
+            }
+        });
+
     },
 
     insertCategory: async (req, res) => {
@@ -65,8 +73,12 @@ module.exports = {
         const category = await db.Category.create(req.body);
         res.status(201).json({
             message: 'Insert a category successfully',
-            data: category
+            data: {
+                ...category.get({ plain: true }), // Convert Sequelize instance to plain object
+                image: getAvatarURL(category.image) // Format image URL
+            }
         });
+
     },
 
     deleteCategory: async (req, res) => {

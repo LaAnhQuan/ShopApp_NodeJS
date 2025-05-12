@@ -46,7 +46,10 @@ router.post('/users/register',
 router.post('/users/login',
     validate(LoginUserRequest),
     asyncHandler(UserController.login))
-router.put('/users/:id',
+router.post('/users/me/:id',
+    requireRoles([UserRole.User, UserRole.Admin]),
+    asyncHandler(UserController.getUserById))
+router.post('/users/:id',
     requireRoles([UserRole.User, UserRole.Admin]),
     asyncHandler(UserController.updateUser))
 

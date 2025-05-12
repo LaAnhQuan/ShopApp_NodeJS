@@ -36,11 +36,15 @@ module.exports = {
         // Send the response
         return res.status(200).json({
             message: 'Get news articles successfully',
-            data: news,
+            data: news.map(article => ({
+                ...article.get({ plain: true }), // Convert Sequelize instance to plain object
+                image: getAvatarURL(article.image) // Format image URL
+            })),
             currentPage: parseInt(page, 10),
             totalPages: Math.ceil(totalNews / pageSize),
-            totalNews
+            totalNews: totalNews
         });
+
     },
 
     getNewsArticleById: async (req, res) => {
@@ -53,10 +57,14 @@ module.exports = {
                 message: 'News not found'
             });
         }
-        res.status(200).json({
+        return res.status(200).json({
             message: 'Get a news successfully',
-            data: newsArticle
-        })
+            data: {
+                ...newsArticle.get({ plain: true }), // Convert Sequelize instance to plain object
+                image: getAvatarURL(newsArticle.image) // Format image URL
+            }
+        });
+
     },
     insertNewsArticle: async (req, res) => {
         // Start a transaction
@@ -100,8 +108,12 @@ module.exports = {
 
             res.status(201).json({
                 message: 'New article added successfully!',
-                data: newsArticle
+                data: {
+                    ...newsArticle.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
+                    image: getAvatarURL(newsArticle.image) // Định dạng URL của ảnh
+                }
             });
+
         } catch (error) {
             // Rollback the transaction in case of an error
             await transaction.rollback();

@@ -35,11 +35,15 @@ module.exports = {
         // Send the response
         return res.status(200).json({
             message: 'Get brands successfully',
-            data: brands,
+            data: brands.map(brand => ({
+                ...brand.get({ plain: true }), // Convert Sequelize instance to plain object
+                image: getAvatarURL(brand.image) // Apply helper function to image field
+            })),
             currentPage: parseInt(page, 10),
             totalPages: Math.ceil(totalBrands / pageSize),
-            totalBrands
+            totalBrands: totalBrands
         });
+
     },
 
     getBrandById: async (req, res) => {
@@ -56,16 +60,24 @@ module.exports = {
         // If the brand is found, return it with a status of 200 OK
         res.status(200).json({
             message: 'Brand information retrieved successfully',
-            data: brand
+            data: {
+                ...brand.get({ plain: true }), // Convert Sequelize instance to plain object
+                image: getAvatarURL(brand.image) // Apply helper function to image field
+            }
         });
+
     },
 
     insertBrand: async (req, res) => {
         const brand = await db.Brand.create(req.body);  // Thêm một thương hiệu mới vào bảng Brand
         res.status(201).json({
             message: 'Insert a brand successfully',
-            data: brand
+            data: {
+                ...brand.get({ plain: true }), // Convert Sequelize instance to plain object
+                image: getAvatarURL(brand.image) // Format image URL
+            }
         });
+
     },
 
     deleteBrand: async (req, res) => {

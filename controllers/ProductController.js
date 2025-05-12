@@ -38,11 +38,15 @@ module.exports = {
         ]);
         return res.status(200).json({
             message: 'Get a product successfully',
-            data: products,
+            data: products.map(product => ({
+                ...product.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
+                image: getAvatarURL(product.image) // Định dạng URL của ảnh
+            })),
             currentPage: parseInt(page, 10),
             totalPages: Math.ceil(totalProducts / pageSize),
             totalProducts
         });
+
 
     },
 
@@ -58,8 +62,12 @@ module.exports = {
         if (product) {
             res.status(200).json({
                 message: 'Product found successfully',
-                data: product
+                data: {
+                    ...product.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
+                    image: getAvatarURL(product.image) // Định dạng URL của ảnh
+                }
             });
+
         } else {
             res.status(404).json({
                 message: 'Product not found'
@@ -72,8 +80,12 @@ module.exports = {
         const product = await db.Product.create(req.body)
         res.status(201).json({
             message: 'Insert a product successfully',
-            data: product
-        })
+            data: {
+                ...product.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
+                image: getAvatarURL(product.image) // Định dạng URL của ảnh
+            }
+        });
+
     },
 
     deleteProduct: async (req, res) => {

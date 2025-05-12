@@ -145,11 +145,43 @@ module.exports = {
 
         await user.save();
         //Nếu avatar không phải là một URL HTTP, nối nó với API_PREFIX để tạo URL đầy đủ
-        user.avatar = getAvatarURL(user.avatar)
+        // user.avatar = getAvatarURL(user.avatar)
 
         return res.status(200).json({
             message: 'User updated successfully',
-            data: user
+            data: {
+                ...user.get({ plain: true }), // Lấy thông tin người dùng và loại bỏ metadata của Sequelize
+                avatar: getAvatarURL(user.avatar)
+            }
+        });
+    },
+    getUserById: async (req, res) => {
+        const { id } = req.params;
+
+        //Chỉ cho phép người dùng xem thông tin của chính họ hoặc nếu họ có vai trò là admin
+        if (req.user.id != id && req.user.role !== UserRole.Admin) {
+            return res.status(403).json({
+                message: "Only users or administrators have access to this information "
+            })
+        }
+
+        // Find user waiting db.User.findByPk(id,
+        const user = await db.User.findByPk(id, {
+            attributes: { exclude: ['password'] } // Remove the password field from the response
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Successfully retrieved user information',
+            data: {
+                ...user.get({ plain: true }), // Retrieve user information and remove metadata from Sequelize
+                avatar: getAvatarURL(user.avatar) // Update the avatar URL before returning it in the response
+            }
         });
     },
 }
