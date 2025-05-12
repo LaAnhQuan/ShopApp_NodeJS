@@ -6,6 +6,8 @@ import ResponseUser from "../dtos/responses/user/ResponseUser";
 import * as argon2 from "argon2";
 import { UserRole } from "../constants";
 import jwt from 'jsonwebtoken'
+import os from 'os'
+import { getAvatarURL } from "../helpers/imageHelper";
 require('dotenv').config();
 
 
@@ -82,6 +84,7 @@ module.exports = {
             {
                 id: user.id, //most important
                 //role: user.role
+                iat: Math.floor(Date.now() / 1000) // Thêm thời điểm tạo token 
             },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRATION }
@@ -100,19 +103,53 @@ module.exports = {
     },
 
     updateUser: async (req, res) => {
-        const userId = req.params.id;
-        const updatedUser = await db.User.update(req.body, {
-            where: { id: userId }
-        });
+        const { id } = req.params;
+        const { name, avatar, old_password, new_password } = req.body;
 
-        if (updatedUser[0] > 0) {  // Sequelize `update` returns an array where the first element is the number of affected rows
-            return res.status(200).json({
-                message: 'User updated successfully',
-            });
-        } else {
+        //Kiểm tra xem người dùng có đang cố gắng cập nhật thông tin của người khác hay không
+        if (req.user.id != id) {
+            return res.status(403).json({
+                message: `Not allowed to update another user's information`
+            })
+        }
+        const user = await db.User.findByPk(id);
+        if (!user) {
             return res.status(404).json({
                 message: 'User not found'
             });
         }
+
+        // Update password if needed
+        if (new_password && old_password) {
+            // Verify old password
+            const passwordValid = await argon2.verify(user.password, old_password);
+            if (!passwordValid) {
+                return res.status(401).json({
+                    message: 'Old password is incorrect'
+                });
+            }
+
+            // Hash new password
+            user.password = await argon2.hash(new_password);
+            user.password_changed_at = new Date(); // Cập nhật thời gian thay đổi mật khẩu
+        } else if (new_password || old_password) {
+            // Only one of the password fields is provided
+            return res.status(400).json({
+                message: 'Both new password and old password are required to password'
+            });
+        }
+
+        // Update personal information
+        user.name = name || user.name;      // Update name if provided
+        user.avatar = avatar || user.avatar; // Update avatar if provided
+
+        await user.save();
+        //Nếu avatar không phải là một URL HTTP, nối nó với API_PREFIX để tạo URL đầy đủ
+        user.avatar = getAvatarURL(user.avatar)
+
+        return res.status(200).json({
+            message: 'User updated successfully',
+            data: user
+        });
     },
 }

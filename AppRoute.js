@@ -46,7 +46,9 @@ router.post('/users/register',
 router.post('/users/login',
     validate(LoginUserRequest),
     asyncHandler(UserController.login))
-router.put('/users/:id', asyncHandler(UserController.updateUser))
+router.put('/users/:id',
+    requireRoles([UserRole.User, UserRole.Admin]),
+    asyncHandler(UserController.updateUser))
 
 // Product Routes
 router.get('/products', asyncHandler(ProductController.getProducts))

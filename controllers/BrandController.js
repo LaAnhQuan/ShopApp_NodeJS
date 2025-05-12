@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize"
 const { Op } = Sequelize
 import db from "../models"
-
+import { getAvatarURL } from "../helpers/imageHelper";
 
 module.exports = {
     getBrands: async (req, res) => {

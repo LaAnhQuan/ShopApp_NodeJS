@@ -8,6 +8,8 @@ import path from 'path'
 import fs from 'fs'
 import db from '../models';
 import { Sequelize } from "sequelize";
+import os from 'os';
+import { getAvatarURL } from "../helpers/imageHelper";
 
 const checkImageInUse = async (imageUrl) => {
     const modelFields = {

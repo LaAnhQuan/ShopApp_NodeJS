@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize"
 import db from "../models"
+import { getAvatarURL } from "../helpers/imageHelper";
 
 module.exports = {
     getOrderDetails: async (req, res) => {

@@ -2,6 +2,7 @@ import { Sequelize, where } from "sequelize"
 const { Op } = Sequelize
 import db from "../models"
 import { OrderStatus } from "../constants"
+import { getAvatarURL } from "../helpers/imageHelper";
 
 module.exports = {
     getOrders: async (req, res) => {

@@ -33,6 +33,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0
       },
+      password_changed_at: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

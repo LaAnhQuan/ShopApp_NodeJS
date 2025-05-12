@@ -3,6 +3,8 @@ const { Op } = Sequelize;
 import db from "../models"
 import InsertProductRequest from "../dtos/requests/product/InsertProductRequest"
 import { date } from "joi"
+import { getAvatarURL } from "../helpers/imageHelper";
+
 
 module.exports = {
     getProducts: async (req, res) => {
