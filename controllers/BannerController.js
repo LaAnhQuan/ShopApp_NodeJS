@@ -34,9 +34,9 @@ module.exports = {
                 ...banner.get({ plain: true }), // Chuyển đổi Sequelize instance thành plain object
                 image: getAvatarURL(banner.image) // Áp dụng hàm getAvatarURL cho trường image
             })),
-            currentPage: parseInt(page, 10),
-            totalPages: Math.ceil(totalBanners / pageSize),
-            totalBanners
+            current_page: parseInt(page, 10),
+            total_page: Math.ceil(totalBanners / pageSize),
+            total: totalBanners
         });
     },
     getBannerById: async (req, res) => {

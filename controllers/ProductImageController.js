@@ -34,9 +34,9 @@ module.exports = {
                 ...productImage.get({ plain: true }),
                 image_url: getAvatarURL(productImage.image_url)
             })),
-            currentPage: page,
-            totalPages: Math.ceil(totalProductImages / pageSize),
-            totalProductImages
+            current_page: page,
+            total_page: Math.ceil(totalProductImages / pageSize),
+            total: totalProductImages
         })
     },
 

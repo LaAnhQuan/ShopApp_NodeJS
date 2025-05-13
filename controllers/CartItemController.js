@@ -26,9 +26,9 @@ module.exports = {
         res.status(200).json({
             message: 'Successfully retrieved cart items',
             data: cartItems,
-            currentPage: parseInt(page),
-            totalPages: Math.ceil(totalCartItems / pageSize),
-            totalCartItems,
+            current_page: parseInt(page),
+            total_pages: Math.ceil(totalCartItems / pageSize),
+            total: totalCartItems,
         });
     },
 

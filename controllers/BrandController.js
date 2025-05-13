@@ -39,9 +39,9 @@ module.exports = {
                 ...brand.get({ plain: true }), // Convert Sequelize instance to plain object
                 image: getAvatarURL(brand.image) // Apply helper function to image field
             })),
-            currentPage: parseInt(page, 10),
-            totalPages: Math.ceil(totalBrands / pageSize),
-            totalBrands: totalBrands
+            current_page: parseInt(page, 10),
+            total_page: Math.ceil(totalBrands / pageSize),
+            total: totalBrands
         });
 
     },

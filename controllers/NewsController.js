@@ -40,9 +40,9 @@ module.exports = {
                 ...article.get({ plain: true }), // Convert Sequelize instance to plain object
                 image: getAvatarURL(article.image) // Format image URL
             })),
-            currentPage: parseInt(page, 10),
-            totalPages: Math.ceil(totalNews / pageSize),
-            totalNews: totalNews
+            current_page: parseInt(page, 10),
+            total_page: Math.ceil(totalNews / pageSize),
+            total: totalNews
         });
 
     },

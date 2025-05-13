@@ -42,9 +42,9 @@ module.exports = {
                 ...product.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
                 image: getAvatarURL(product.image) // Định dạng URL của ảnh
             })),
-            currentPage: parseInt(page, 10),
-            totalPages: Math.ceil(totalProducts / pageSize),
-            totalProducts
+            current_page: parseInt(page, 10),
+            total_page: Math.ceil(totalProducts / pageSize),
+            total: totalProducts
         });
 
 

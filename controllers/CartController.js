@@ -32,9 +32,9 @@ module.exports = {
         return res.status(200).json({
             message: 'Get carts successfully',
             data: carts,
-            currentPage: parseInt(page, 10),
-            totalPages: Math.ceil(totalCarts / pageSize),
-            totalCarts
+            current_page: parseInt(page, 10),
+            total_page: Math.ceil(totalCarts / pageSize),
+            total: totalCarts
         });
     },
 
