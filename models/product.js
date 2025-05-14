@@ -34,6 +34,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'product_id',
         // as: 'cart_items' // Thêm bí danh 'as' để sử dụng trong truy vấn
       })
+      Product.hasMany(models.ProductAttributeValue, {
+        foreignKey: 'product_id',
+        as: 'attributes' // Thêm bí danh 'as' để sử dụng trong truy vấn
+      })
     }
   }
   Product.init({

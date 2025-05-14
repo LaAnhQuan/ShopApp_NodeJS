@@ -66,7 +66,7 @@ router.put('/products/:id',
     requireRoles([UserRole.Admin]),
     validateImageExists,
     validate(UpdateProductRequest),
-    asyncHandler(ProductController.updateProduct))
+    asyncHandler(ProductController.updatedProduct))
 router.delete('/products/:id',
     requireRoles([UserRole.Admin]),
     asyncHandler(ProductController.deleteProduct))
