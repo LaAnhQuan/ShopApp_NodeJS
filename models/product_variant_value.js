@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class ProductAttributeValue extends Model {
+  class ProductVariantValue extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,26 +11,24 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      ProductAttributeValue.belongsTo(models.Product, {
+      ProductVariantValue.belongsTo(models.Product, {
         foreignKey: 'product_id',
-      })
-      ProductAttributeValue.belongsTo(models.Attribute, {
-        foreignKey: 'attribute_id',
-        as: 'attribute'
       })
     }
   }
-  ProductAttributeValue.init({
+  ProductVariantValue.init({
     product_id: DataTypes.INTEGER,
-    attribute_id: DataTypes.INTEGER,
-    value: DataTypes.TEXT //Giá trị của thuộc tính ví dụ: "Intel i7", "16GB", "Đỏ"
+    price: DataTypes.INTEGER,
+    old_price: DataTypes.INTEGER,
+    stock: DataTypes.INTEGER,
+    sku: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'ProductAttributeValue',
-    tableName: 'product_attribute_values',
+    modelName: 'ProductVariantValue',
+    tableName: 'product_variant_values',
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
   });
-  return ProductAttributeValue;
+  return ProductVariantValue;
 };

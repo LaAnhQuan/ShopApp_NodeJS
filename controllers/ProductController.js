@@ -4,18 +4,18 @@ import db from "../models"
 import InsertProductRequest from "../dtos/requests/product/InsertProductRequest"
 import { date } from "joi"
 import { getAvatarURL } from "../helpers/imageHelper";
+import attribute from "../models/attribute";
 
 
 module.exports = {
     getProducts: async (req, res) => {
-        // const products = await db.Product.findAll() //not good, must "paging"
-        //search and paging 
-        //req.query.search, eg: ...?search=iphone16&page=1
-        //name, description, or description, or specification contains "search" 
-        const { search = '', page = 1 } = req.query; // Default to an empty search
-        const pageSize = 5; // Define the number of items per page
+        const { search = '', page = 1 } = req.query;
+        const pageSize = 5;
         const offset = (page - 1) * pageSize;
+
         let whereClause = {};
+        let attributeWhereClause = {};
+
         if (search.trim() !== '') {
             whereClause = {
                 [Op.or]: [
@@ -24,40 +24,37 @@ module.exports = {
                     { specification: { [Op.like]: `%${search}%` } }
                 ]
             };
-        }
-        let attributeWhereClause = {}
-        if (search.trim() !== '') {
+
             attributeWhereClause = {
                 value: { [Op.like]: `%${search}%` }
             };
         }
+
+        // Tìm tổng số sản phẩm thỏa điều kiện, bao gồm cả tìm theo attribute
         const [products, totalProducts] = await Promise.all([
             db.Product.findAll({
                 where: whereClause,
-                include: [
-                    {
-                        model: db.ProductAttributeValue,
-                        as: 'attributes',
-                        include: [{ model: db.Attribute }],
-                        where: attributeWhereClause,
-                        required: false // Không bắt buộc sản phẩm nào cũng có thuộc tính
-                    }
-                ],
+                include: [{
+                    model: db.ProductAttributeValue,
+                    as: 'product_attribute_values',
+                    include: [{ model: db.Attribute, as: 'attribute' }],
+                    where: attributeWhereClause,
+                    required: false
+                }],
                 limit: pageSize,
-                offset: offset,
-                // Có thể thêm `order` nếu cần sắp xếp
+                offset,
+                order: [['created_at', 'DESC']]
             }),
-            db.Product.count({
-                where: whereClause
-            })
+            db.Product.count({ where: whereClause })
         ]);
+
         return res.status(200).json({
-            message: 'Lấy danh sách sản phẩm thành công',
+            message: 'Get list product successfully',
             data: products.map(product => ({
-                ...product.get({ plain: true }), // Chuyển đổi Sequelize instance thành plain object
-                image: getAvatarURL(product.image), // Áp dụng hàm getAvatarURL cho trường image
-                attributes: product.attributes.map(attr => ({
-                    name: attr.Attribute.name,
+                ...product.get({ plain: true }),
+                image: getAvatarURL(product.image),
+                attributes: product.product_attribute_values.map(attr => ({
+                    name: attr.attribute?.name || null,
                     value: attr.value
                 }))
             })),
@@ -65,43 +62,95 @@ module.exports = {
             totalPages: Math.ceil(totalProducts / pageSize),
             total: totalProducts
         });
-
-
     },
+
+
 
     getProductById: async (req, res) => {
         const { id } = req.params;  // Lấy id từ params trong URL
         const product = await db.Product.findByPk(id, {
             include: [
                 {
-                    model: db.ProductImage, // Su dung ten model dung dinh nghia trong associations
-                    as: 'product_images' // Đảm bảo rằng đã khai báo 'as' trong mối quan hệ associations nếu có 
-                },
-                {
                     model: db.ProductAttributeValue, //Bao gồm thuocj tính động
-                    as: 'attributes',
+                    as: 'product_attribute_values',
                     include: [
                         {
-                            model: db.Attribute, //Bao gồm tên của thuộc tính từ bảng Attribute
-                            attributes: ['name'] // Lấy tên thuocj tính 
+                            model: db.Attribute,
+                            as: 'attribute', //Bao gồm tên của thuộc tính từ bảng Attribute
+                            attributes: ['id', 'name'] // Lấy tên thuocj tính 
                         }
                     ]
+                },
+                {
+                    model: db.ProductVariantValue,
+                    as: 'product_variant_values',
+                    attributes: ['id', 'price', 'old_price', 'stock', 'sku'],
                 }
             ]
 
         });
 
+
         if (product) {
-            res.status(200).json({
+            // Lấy danh sách variant_values từ các sku trong product_variant_values
+            const variantValuesData = [];
+            for (const variant of product.product_variant_values) {
+                const variantValueIds = variant.sku.split('-').map(Number);
+                const variantValues = await db.VariantValue.findAll({
+                    where: { id: variantValueIds },
+                    include: [
+                        {
+                            model: db.Variant,
+                            as: 'variants',
+                            attributes: ['id', 'name'],
+                        }
+                    ]
+                });
+
+                // Gắn variant_values chi tiết vào biến thể hiện tại
+                variantValuesData.push({
+                    id: variant.id,
+                    price: variant.price,
+                    old_price: variant.old_price,
+                    stock: variant.stock,
+                    sku: variant.sku,
+                    values: variantValues.map(value => ({
+                        id: value.id,
+                        name: value.variants?.name || null,
+                        value: value.value,
+                        image: value.image || null,
+                    }))
+                })
+            }
+            // Xử lý dữ liệu để trả về phản hồi
+            const productData = {
+                id: product.id,
+                name: product.name,
+                description: product.description,
+                rating: product.rating,
+                total_ratings: product.total_ratings,
+                total_sold: product.total_sold,
+                brand_id: product.brand_id,
+                category_id: product.category_id,
+                image: product.image,
+                created_at: product.create_at,
+                updated_at: product.updated_at
+            }
+            return res.status(200).json({
                 message: 'Product found successfully',
                 data: {
-                    ...product.get({ plain: true }), // Chuyển đổi Sequelize instance thành plain object.
+                    ...productData, // Dùng lại object đã chuẩn bị
+
                     image: getAvatarURL(product.image),
-                    product_images: product.product_images.map(img => getAvatarURL(img.image_url)),
-                    attributes: product.attributes.map(attr => ({
-                        name: attr.Attribute.name,// Truy cập thuộc tính `name` từ bảng Attribute (quan hệ giữa Product và Attribute thông qua ProductAttributeValue)
-                        value: attr.value // Lấy giá trị thuộc tính từ bảng ProductAttributeValue (ví dụ: "6GB", "512GB", v.v...)
-                    }))
+                    product_images: product.product_images?.map(img => getAvatarURL(img.image_url)) || [],
+
+                    attributes: product.product_attribute_values.map(attrVal => ({
+                        id: attrVal.id,
+                        name: attrVal.attribute?.name || null,
+                        value: attrVal.value
+                    })),
+
+                    variants: variantValuesData
                 }
 
             });
@@ -114,142 +163,273 @@ module.exports = {
     },
 
     insertProduct: async (req, res) => {
-        //Tach attributes khỏi phần tử attributes từ req.body 
-        //và tách phần dữ liệu sản phẩm còn lại (productData) để lưu vào bảng products;
+        const { name, attributes = [], variants = [], variant_values = [], ...productData } = req.body;
 
-        const { name, attributes = [], ...productData } = req.body;
-        // Kiueerm tra xem tên sản phẩm đã tồn tại trong cơ sở dữ liệu hay chưa
+        // Check if category_id and brand_id exist
+        const { category_id, brand_id } = productData;
+        const categoryExists = await db.Category.findByPk(category_id);
+        if (!categoryExists) {
+            return res.status(400).json({
+                message: `Category ID ${category_id} does not exist, please check again.`
+            });
+        }
+
+        const brandExists = await db.Brand.findByPk(brand_id);
+        if (!brandExists) {
+            return res.status(400).json({
+                message: `Brand ID ${brand_id} does not exist, please check again.`,
+            });
+        }
+
+        // Start a transaction
+        const transaction = await db.sequelize.transaction();
+
+        // Check if a product with the same name already exists
         const productExists = await db.Product.findOne({
-            where: { name }
+            where: { name },
         });
 
         if (productExists) {
             return res.status(400).json({
-                message: 'Product name already exists, please choose another one',
-                data: productExists
+                message: 'Product name already exists, please choose a different name.',
+                data: productExists,
             });
         }
-        // Tạo các sản phẩm mới trong bảng products
-        const product = await db.Product.create({ ...productData, name });
+        // Create new product
+        const product = await db.Product.create(
+            { ...productData, name },
+            { transaction }
+        );
 
         // Xử lý các thuộc tính động
+        const createdAttributes = [];
         for (const attributeData of attributes) {
-            // Create a new attribute in the attributes table (if not exists)
+            // Tìm hoặc tạo mới thuộc tính
             const [attribute] = await db.Attribute.findOrCreate({
-                where: { name: attributeData.name }
+                where: { name: attributeData.name },
+                transaction, // Use transaction
             });
-            // Add attribute value to the product_attribute_values table
-            await db.ProductAttributeValue.create({
-                product_id: product.id,
-                attribute_id: attribute.id,
+
+            // Thêm giá trị thuộc tính vào bảng product_attribute_values
+            await db.ProductAttributeValue.create(
+                {
+                    product_id: product.id,
+                    attribute_id: attribute.id,
+                    value: attributeData.value,
+                },
+                { transaction } // Use transaction
+            )
+            // Lưu trữ thông tin thuộc tính để trả về
+            createdAttributes.push({
+                name: attribute.name,
                 value: attributeData.value
-            });
+            })
         }
 
-        // Return product information along with dynamic attributes
-        return res.status(201).json({
-            message: 'Product added successfully',
+        // Xử lý các biến thể (variants)
+        for (const variant of variants) {
+            const [variantEntry] = await db.Variant.findOrCreate({
+                where: { name: variant.name },
+                transaction
+            });
+            for (const value of variant.values) {
+                await db.VariantValue.findOrCreate({
+                    where: { value, variant_id: variantEntry.id },
+                    transaction
+                })
+            }
+        }
+        // Xử lý các giá trị biến thể {variant_values}
+        const createdVariantValues = [];
+        for (const variantData of variant_values) {
+            const variantValueIds = [];
+            for (const value of variantData.variant_combination) {
+                const variantValue = await db.VariantValue.findOne({
+                    where: { value },
+                    transaction,
+                });
+
+                if (variantValue) {
+                    variantValueIds.push(variantValue.id);
+                }
+            }
+
+            // Tạo mã SKU theo nguyên tắc "id1-id2-id3-..."
+            const sku = variantValueIds.sort((a, b) => a - b).join('-')
+            // Thêm biến thể vào bảng product_variant_values
+            const createdVariant = await db.ProductVariantValue.create(
+                {
+                    product_id: product.id,
+                    price: variantData.price,
+                    old_price: variantData.old_price || null,
+                    stock: variantData.stock || 0,
+                    sku,
+                },
+                { transaction } // Sử dụng transaction
+            );
+
+            createdVariantValues.push({
+                sku,
+                price: createdVariant.price,
+                old_price: createdVariant.old_price,
+                stock: createdVariant.stock,
+            })
+        }
+
+        //Commit transaction
+        await transaction.commit();
+
+        // Trả về thông tin sản phẩm kèm theo các biển thể
+        return res.status(200).json({
+            message: "Insert product is successful",
             data: {
                 ...product.get({ plain: true }), // Convert Sequelize instance to plain object
                 image: getAvatarURL(product.image), // Apply getAvatarURL function to image field
-                attributes: attributes.map(attr => ({
-                    name: attr.name,
-                    value: attr.value
-                }))
+                attributes: createdAttributes,
+                variants: variants.map(variant => ({
+                    name: variant.name,
+                    values: variant.values
+                })),
+                variant_values: createdVariantValues
             }
-        });
-
-
-
+        })
     },
 
     deleteProduct: async (req, res) => {
         const { id } = req.params;
+        const transaction = await db.sequelize.transaction();
+
         const orderDetailExists = await db.OrderDetail.findOne({
             where: { product_id: id },
             include: [{
-                model: db.Order, // Bao gồm thông tin từ bảng `Order`
-                as: 'order',     // Đảm bảo alias hợp lý nếu đã đặt alias trong associations
-                attributes: ['id', 'status', 'note', 'total', 'created_at'] // Chọn các trường cần thiết từ Order
-            }]
+                model: db.Order,
+                as: 'order',
+                attributes: ['id', 'status', 'note', 'total', 'created_at']
+            }],
+            transaction
         });
 
-        // Nếu có OrderDetail tham chiếu đến sản phẩm, không cho phép xóa và trả về thông tin đơn hàng
         if (orderDetailExists) {
+            await transaction.rollback();
             return res.status(400).json({
                 message: 'Cannot delete the product because it is referenced by an existing order.',
-                data: {
-                    order: orderDetailExists.order
-                }
+                data: { order: orderDetailExists.order }
             });
         }
-        // Xóa các bản ghi trong bảng 'product_attribute_values' liên quan đến sản phẩm
+
         await db.ProductAttributeValue.destroy({
-            where: { product_id: id }
-        })
-        // Xóa sản phẩm khỏi bảng `products`
+            where: { product_id: id },
+            transaction
+        });
+
+        await db.ProductVariantValue.destroy({
+            where: { product_id: id },
+            transaction
+        });
+
         const deleted = await db.Product.destroy({
-            where: { id }
+            where: { id },
+            transaction
         });
 
         if (deleted) {
-            return res.status(200).json({
-                message: 'Product deleted successfully'
-            });
+            await transaction.commit();
+            return res.status(200).json({ message: 'Product deleted successfully' });
         } else {
-            return res.status(404).json({
-                message: 'Product not found'
-            });
+            await transaction.rollback();
+            return res.status(404).json({ message: 'Product not found' });
         }
-
     },
 
     updatedProduct: async (req, res) => {
         const { id } = req.params;
-        const { attributes = [], ...productData } = req.body;
+        const { attributes = [], variants = [], variant_values = [], ...productData } = req.body;
 
-        // Cập nhật thông tin cơ bản của sản phẩm trong bảng `products`
-        const [updatedRowCount] = await db.Product.update(productData, {
-            where: { id }
-        });
+        const transaction = await db.sequelize.transaction();
 
-        if (updatedRowCount > 0) {
-            // Nếu cập nhật thành công, tiến hành cập nhật thuộc tính động
-            for (const attr of attributes) {
-                // Tìm hoặc tạo thuộc tính trong bảng `attributes`
-                const [attribute] = await db.Attribute.findOrCreate({
-                    where: { name: attr.name }
+        const [updatedCount] = await db.Product.update(productData, { where: { id }, transaction });
+
+        if (updatedCount === 0) {
+            await transaction.rollback();
+            return res.status(404).json({ message: 'Không tìm thấy sản phẩm để cập nhật' });
+        }
+
+        for (const attr of attributes) {
+            const [attribute] = await db.Attribute.findOrCreate({
+                where: { name: attr.name },
+                transaction
+            });
+
+            const productAttributeValue = await db.ProductAttributeValue.findOne({
+                where: { product_id: id, attribute_id: attribute.id },
+                transaction
+            });
+
+            if (productAttributeValue) {
+                await productAttributeValue.update({ value: attr.value }, { transaction });
+            } else {
+                await db.ProductAttributeValue.create({
+                    product_id: id,
+                    attribute_id: attribute.id,
+                    value: attr.value
+                }, { transaction });
+            }
+        }
+
+        for (const variant of variants) {
+            const [variantEntry] = await db.Variant.findOrCreate({
+                where: { name: variant.name },
+                transaction
+            });
+
+            for (const value of variant.values) {
+                await db.VariantValue.findOrCreate({
+                    where: { value, variant_id: variantEntry.id },
+                    transaction
+                });
+            }
+        }
+
+        for (const variantData of variant_values) {
+            const variantValueIds = [];
+
+            for (const value of variantData.variant_combination) {
+                const variantValue = await db.VariantValue.findOne({
+                    where: { value },
+                    transaction
                 });
 
-                // Tìm xem thuộc tính đã tồn tại cho sản phẩm chưa
-                const productAttributeValue = await db.ProductAttributeValue.findOne({
-                    where: {
-                        product_id: id,
-                        attribute_id: attribute.id
-                    }
-                });
-
-                if (productAttributeValue) {
-                    // Nếu thuộc tính đã tồn tại, cập nhật giá trị
-                    await productAttributeValue.update({ value: attr.value });
-                } else {
-                    // Nếu chưa tồn tại, thêm mới thuộc tính và giá trị vào bảng `product_attribute_values`
-                    await db.ProductAttributeValue.create({
-                        product_id: id,
-                        attribute_id: attribute.id,
-                        value: attr.value
-                    });
+                if (variantValue) {
+                    variantValueIds.push(variantValue.id);
                 }
             }
 
-            return res.status(200).json({
-                message: 'Product updated successfully'
+            const sku = variantValueIds.sort((a, b) => a - b).join('-');
+
+            const existingVariant = await db.ProductVariantValue.findOne({
+                where: { product_id: id, sku },
+                transaction
             });
-        } else {
-            // Nếu không tìm thấy sản phẩm cần cập nhật
-            return res.status(404).json({
-                message: 'Product not found'
-            });
+
+            if (existingVariant) {
+                await existingVariant.update({
+                    price: variantData.price,
+                    old_price: variantData.old_price || null,
+                    stock: variantData.stock || 0
+                }, { transaction });
+            } else {
+                await db.ProductVariantValue.create({
+                    product_id: id,
+                    price: variantData.price,
+                    old_price: variantData.old_price || null,
+                    stock: variantData.stock || 0,
+                    sku,
+                }, { transaction });
+            }
         }
-    }
+
+        await transaction.commit();
+        return res.status(200).json({ message: 'Product updated successfully' });
+    },
+
 }

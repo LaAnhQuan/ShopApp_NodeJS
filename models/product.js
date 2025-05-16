@@ -36,7 +36,11 @@ module.exports = (sequelize, DataTypes) => {
       })
       Product.hasMany(models.ProductAttributeValue, {
         foreignKey: 'product_id',
-        as: 'attributes' // Thêm bí danh 'as' để sử dụng trong truy vấn
+        as: 'product_attribute_values' // Thêm bí danh 'as' để sử dụng trong truy vấn
+      })
+      Product.hasMany(models.ProductVariantValue, {
+        foreignKey: 'product_id',
+        as: 'product_variant_values' // Thêm bí danh 'as' để sử dụng trong truy vấn
       })
     }
   }
@@ -46,11 +50,15 @@ module.exports = (sequelize, DataTypes) => {
     oldprice: DataTypes.INTEGER,
     image: DataTypes.TEXT,
     description: DataTypes.TEXT,
+    stock: DataTypes.TEXT,
     specification: DataTypes.TEXT,
+    total_sold: DataTypes.INTEGER,
     buyturn: DataTypes.INTEGER,
     quantity: DataTypes.INTEGER,
     brand_id: DataTypes.INTEGER,
-    category_id: DataTypes.INTEGER
+    category_id: DataTypes.INTEGER,
+    rating: DataTypes.DECIMAL(2, 1),
+    total_ratings: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Product',
@@ -61,3 +69,5 @@ module.exports = (sequelize, DataTypes) => {
   });
   return Product;
 };
+
+
