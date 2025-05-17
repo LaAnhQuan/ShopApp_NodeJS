@@ -14,17 +14,18 @@ module.exports = (sequelize, DataTypes) => {
       CartItem.belongsTo(models.Cart, {
         foreignKey: 'cart_id',
         as: 'cart'
-      }),
-        CartItem.belongsTo(models.Product, {
-          foreignKey: 'product_id',
-          as: 'product'
-        })
+      })
+      CartItem.belongsTo(models.ProductVariantValue, {
+        foreignKey: 'product_variant_id',
+        as: 'product_variant_values'
+      })
     }
   }
   CartItem.init({
     cart_id: DataTypes.INTEGER,
+    product_variant_id: DataTypes.INTEGER,
     product_id: DataTypes.INTEGER,
-    quantity: DataTypes.INTEGER
+    quantity: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'CartItem',

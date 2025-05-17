@@ -1,5 +1,6 @@
 import Joi from "joi";
 import { UserRole } from "../../../constants";
+import { join } from "path";
 //import bcrypt from 'bcryptjs'; // Assuming bcrypt is used for encrypting the password
 
 class InsertUserRequest {
@@ -24,6 +25,7 @@ class InsertUserRequest {
             email: Joi.string().email().optional(),
             password: Joi.string().min(6).optional(), // optional(Login Facebook, Google)
             name: Joi.string().required(),
+            role: Joi.number().required().default(1),
             avatar: Joi.string().uri().allow('').optional(), // Optional and must be a valid URL
             phone: Joi.string().optional() // Optional field for phone numbers
         });

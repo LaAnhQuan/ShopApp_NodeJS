@@ -17,6 +17,15 @@ module.exports = {
                 where: whereClause,
                 limit: pageSize,
                 offset: offset,
+                include: [{
+                    model: db.ProductVariantValue,
+                    as: 'product_variant_values',  // Alias để liên kết với ProductVariantValue
+                    include: [{
+                        model: db.Product,
+                        as: 'product',  // Alias để liên kết với Product
+                        attributes: ['id', 'name', 'image', 'description']  // Các trường cần thiết
+                    }]
+                }]
             }),
             db.CartItem.count({
                 where: whereClause,
@@ -34,7 +43,17 @@ module.exports = {
 
     getCartItemById: async (req, res) => {
         const { id } = req.params;
-        const cartItem = await db.CartItem.findByPk(id);
+        const cartItem = await db.CartItem.findByPk(id, {
+            include: [{
+                model: db.ProductVariantValue,
+                as: 'product_variant_values',
+                include: [{
+                    model: db.Product,
+                    as: 'product',
+                    attributes: ['id', 'name', 'image', 'description']
+                }]
+            }]
+        });
 
         if (!cartItem) {
             return res.status(404).json({
@@ -51,7 +70,16 @@ module.exports = {
     getCartItemsByCartId: async (req, res) => {
         const { cart_id } = req.params;
         const cartItem = await db.CartItem.findAll({
-            where: { cart_id: cart_id } //Tim tat ca cac cart items liên quan đến cart_id đã được cung cấp
+            where: { cart_id: cart_id }, // Tim tat ca cac cart items liên quan đến cart_id đã được cung cấp
+            include: [{
+                model: db.ProductVariantValue,
+                as: 'product_variant_values',
+                include: [{
+                    model: db.Product,
+                    as: 'product',
+                    attributes: ['id', 'name', 'image', 'description']
+                }]
+            }]
         });
 
         return res.status(200).json({
@@ -60,46 +88,49 @@ module.exports = {
         });
     },
 
-
     insertCartItem: async (req, res) => {
+        const { product_variant_id, quantity, cart_id } = req.body;
 
-        const { product_id, quantity, cart_id } = req.body;
-
-        const productExists = await db.Product.findByPk(product_id);
-        if (!productExists) {
+        // Kiểm tra xem product_variant_id có tồn tại trong bảng ProductVariantValue không
+        const productVariantExists = await db.ProductVariantValue.findByPk(product_variant_id);
+        if (!productVariantExists) {
             return res.status(404).json({
-                message: 'Product is not found'
+                message: 'Product variant not found'
             })
         }
 
-        // Kiểm tra số lượng sản phâm có còn đủ hay là không
-        if (productExists.quantity < quantity) {
+        // Kiểm tra số lượng sản phẩm có đủ không
+        if (productVariantExists.stock < quantity) {
             return res.status(400).json({
                 message: 'Product quantity not enough'
             })
         }
+
+        // Kiểm tra xem cart_id có tồn tại không
         const cartExists = await db.Cart.findByPk(cart_id);
         if (!cartExists) {
             return res.status(404).json({
-                message: 'Cart is not found'
+                message: 'Cart not found'
             })
         }
 
+        // Kiểm tra nếu sản phẩm đã tồn tại trong giỏ hàng
         const existingCartItem = await db.CartItem.findOne({
             where: {
-                product_id: product_id,
+                product_variant_id: product_variant_id,
                 cart_id: cart_id
             }
-        })
+        });
+
         if (existingCartItem) {
             if (quantity === 0) {
-                // If quantity is 0, remove the item
+                // Nếu số lượng bằng 0, xóa item
                 await existingCartItem.destroy();
                 return res.status(200).json({
                     message: 'Cart item has been removed'
                 });
             } else {
-                // Update the quantity of the existing cart item
+                // Cập nhật số lượng nếu item đã tồn tại
                 existingCartItem.quantity = quantity;
                 await existingCartItem.save();
                 return res.status(200).json({
@@ -108,7 +139,7 @@ module.exports = {
                 });
             }
         } else {
-            // If the item doesn't exist and quantity is not 0, create a new item
+            // Nếu item chưa tồn tại trong giỏ hàng và quantity > 0
             if (quantity > 0) {
                 const newCartItem = await db.CartItem.create(req.body);
                 return res.status(201).json({
@@ -117,7 +148,6 @@ module.exports = {
                 });
             }
         }
-
     },
 
     deleteCartItem: async (req, res) => {
@@ -136,6 +166,7 @@ module.exports = {
             message: 'Cart item not found',
         });
     },
+
     updateCartItem: async (req, res) => {
         const { id } = req.params;
         const [updated] = await db.CartItem.update(req.body, {
@@ -153,6 +184,5 @@ module.exports = {
         res.status(404).json({
             message: 'Cart item not found',
         });
-
     }
 };

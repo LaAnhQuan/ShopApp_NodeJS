@@ -7,9 +7,11 @@
 -- Server version: 5.7.40
 -- PHP Version: 8.2.27
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE
+= "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET time_zone
+= "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -27,11 +29,15 @@ SET time_zone = "+00:00";
 -- Table structure for table `banners`
 --
 
-CREATE TABLE `banners` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
+CREATE TABLE `banners`
+(
+  `id` int
+(11) NOT NULL,
+  `name` varchar
+(255) DEFAULT NULL,
   `image` text,
-  `status` int(11) DEFAULT NULL,
+  `status` int
+(11) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -42,10 +48,14 @@ CREATE TABLE `banners` (
 -- Table structure for table `banner_details`
 --
 
-CREATE TABLE `banner_details` (
-  `id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `banner_id` int(11) NOT NULL,
+CREATE TABLE `banner_details`
+(
+  `id` int
+(11) NOT NULL,
+  `product_id` int
+(11) NOT NULL,
+  `banner_id` int
+(11) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -56,9 +66,12 @@ CREATE TABLE `banner_details` (
 -- Table structure for table `brands`
 --
 
-CREATE TABLE `brands` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
+CREATE TABLE `brands`
+(
+  `id` int
+(11) NOT NULL,
+  `name` varchar
+(255) NOT NULL,
   `image` text,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
@@ -68,7 +81,10 @@ CREATE TABLE `brands` (
 -- Dumping data for table `brands`
 --
 
-INSERT INTO `brands` (`id`, `name`, `image`, `created_at`, `updated_at`) VALUES
+INSERT INTO `brands` (`
+id`,
+`name
+`, `image`, `created_at`, `updated_at`) VALUES
 (1, 'Samsung', NULL, '2025-04-05 11:49:28', '2025-04-05 11:49:28'),
 (3, 'Xiaomi', NULL, '2025-04-05 15:16:07', '2025-04-05 15:16:07'),
 (4, 'Apple', NULL, '2025-04-05 15:16:16', '2025-04-05 15:16:16'),
@@ -89,9 +105,12 @@ INSERT INTO `brands` (`id`, `name`, `image`, `created_at`, `updated_at`) VALUES
 -- Table structure for table `categories`
 --
 
-CREATE TABLE `categories` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
+CREATE TABLE `categories`
+(
+  `id` int
+(11) NOT NULL,
+  `name` varchar
+(255) NOT NULL,
   `image` text,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
@@ -101,7 +120,10 @@ CREATE TABLE `categories` (
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`id`, `name`, `image`, `created_at`, `updated_at`) VALUES
+INSERT INTO `categories` (`
+id`,
+`name
+`, `image`, `created_at`, `updated_at`) VALUES
 (1, 'Do gia dung', NULL, '2025-04-05 15:18:09', '2025-04-05 15:18:09'),
 (2, 'Thoi trang', NULL, '2025-04-05 15:18:32', '2025-04-05 15:18:32'),
 (3, 'Dien thoai thong minh', NULL, '2025-04-05 15:18:55', '2025-04-05 15:18:55'),
@@ -113,11 +135,16 @@ INSERT INTO `categories` (`id`, `name`, `image`, `created_at`, `updated_at`) VAL
 -- Table structure for table `feedbacks`
 --
 
-CREATE TABLE `feedbacks` (
-  `id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `star` int(11) DEFAULT NULL,
+CREATE TABLE `feedbacks`
+(
+  `id` int
+(11) NOT NULL,
+  `product_id` int
+(11) NOT NULL,
+  `user_id` int
+(11) NOT NULL,
+  `star` int
+(11) DEFAULT NULL,
   `content` text,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
@@ -129,9 +156,12 @@ CREATE TABLE `feedbacks` (
 -- Table structure for table `news`
 --
 
-CREATE TABLE `news` (
-  `id` int(11) NOT NULL,
-  `title` varchar(255) DEFAULT NULL,
+CREATE TABLE `news`
+(
+  `id` int
+(11) NOT NULL,
+  `title` varchar
+(255) DEFAULT NULL,
   `image` text,
   `content` text,
   `created_at` datetime NOT NULL,
@@ -144,10 +174,14 @@ CREATE TABLE `news` (
 -- Table structure for table `news_details`
 --
 
-CREATE TABLE `news_details` (
-  `id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `news_id` int(11) NOT NULL,
+CREATE TABLE `news_details`
+(
+  `id` int
+(11) NOT NULL,
+  `product_id` int
+(11) NOT NULL,
+  `news_id` int
+(11) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -158,12 +192,17 @@ CREATE TABLE `news_details` (
 -- Table structure for table `orders`
 --
 
-CREATE TABLE `orders` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `status` int(11) DEFAULT NULL,
+CREATE TABLE `orders`
+(
+  `id` int
+(11) NOT NULL,
+  `user_id` int
+(11) NOT NULL,
+  `status` int
+(11) DEFAULT NULL,
   `note` text,
-  `total` int(11) DEFAULT NULL,
+  `total` int
+(11) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -174,12 +213,18 @@ CREATE TABLE `orders` (
 -- Table structure for table `order_details`
 --
 
-CREATE TABLE `order_details` (
-  `id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `price` int(11) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
+CREATE TABLE `order_details`
+(
+  `id` int
+(11) NOT NULL,
+  `order_id` int
+(11) NOT NULL,
+  `product_id` int
+(11) NOT NULL,
+  `price` int
+(11) DEFAULT NULL,
+  `quantity` int
+(11) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -190,18 +235,27 @@ CREATE TABLE `order_details` (
 -- Table structure for table `products`
 --
 
-CREATE TABLE `products` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `price` int(11) DEFAULT '0',
-  `oldprice` int(11) DEFAULT '0',
+CREATE TABLE `products`
+(
+  `id` int
+(11) NOT NULL,
+  `name` varchar
+(255) DEFAULT NULL,
+  `price` int
+(11) DEFAULT '0',
+  `oldprice` int
+(11) DEFAULT '0',
   `image` text,
   `description` text,
   `specification` text,
-  `buyturn` int(11) DEFAULT '0',
-  `quantity` int(11) DEFAULT '0',
-  `brand_id` int(11) NOT NULL,
-  `category_id` int(11) NOT NULL,
+  `buyturn` int
+(11) DEFAULT '0',
+  `quantity` int
+(11) DEFAULT '0',
+  `brand_id` int
+(11) NOT NULL,
+  `category_id` int
+(11) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -210,7 +264,13 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `price`, `oldprice`, `image`, `description`, `specification`, `buyturn`, `quantity`, `brand_id`, `category_id`, `created_at`, `updated_at`) VALUES
+INSERT INTO `products` (`
+id`,
+`name`,
+`price`,
+`oldprice`,
+`image
+`, `description`, `specification`, `buyturn`, `quantity`, `brand_id`, `category_id`, `created_at`, `updated_at`) VALUES
 (3, 'Galaxy S22 Ultra', 24990000, 27990000, '', 'Galaxy S22 Ultra voi but S Pen tich hop, hieu nang dot pha va kha nang chup anh chuyen nghiep, la su ket hop hoan hao giua dien thoai va may tinh bang trong mot thiet ke sang trong.', 'Man hinh Dynamic AMOLED 2X 6.8 inch, do phan giai 3200x1440; Chipset Exynos 2200; RAM 12GB; Bo nho trong 256GB; Camera sau: chinh 108MP, ultra-wide 12MP, telephoto 10MP va periscope 10MP; Camera truoc: 40MP; Pin 5000 mAh voi sac sieu nhanh.', 320, 85, 1, 3, '2025-04-05 16:51:19', '2025-04-05 16:51:19'),
 (5, 'iPhone 14 Pro Max', 35990000, 38990000, '', 'iPhone 14 Pro Max voi man hinh Super Retina XDR 6.7 inch, chip A16 Bionic manh me va he thong camera 48MP giup tao ra nhung buc anh sac net va chat luong.', 'Man hinh Super Retina XDR 6.7 inch, do phan giai 2778x1284; Chipset A16 Bionic; RAM 6GB; Bo nho trong 128GB; Camera sau: chinh 48MP, ultra-wide 12MP, telephoto 12MP; Camera truoc: 12MP; Pin 4323 mAh voi sac nhanh.', 420, 75, 4, 3, '2025-04-06 09:02:32', '2025-04-06 09:02:32'),
 (6, 'Samsung Galaxy Z Fold 4', 44990000, 49990000, '', 'Galaxy Z Fold 4 voi man hinh gap doc dao va hieu suat manh me, la lua chon ly tuong cho nhung ai yeu thich trai nghiem da nhiem va sang tao.', 'Man hinh chinh Dynamic AMOLED 2X 7.6 inch, do phan giai 2208x1768; Chipset Snapdragon 8+ Gen 1; RAM 12GB; Bo nho trong 256GB; Camera sau: chinh 50MP, ultra-wide 12MP, telephoto 10MP; Camera truoc: 10MP va 4MP duoi man hinh; Pin 4400 mAh.', 185, 60, 1, 3, '2025-04-06 09:02:46', '2025-04-06 09:02:46'),
@@ -235,66 +295,114 @@ INSERT INTO `products` (`id`, `name`, `price`, `oldprice`, `image`, `description
 -- Triggers `products`
 --
 DELIMITER $$
-CREATE TRIGGER `check_buyturn_before_insert` BEFORE INSERT ON `products` FOR EACH ROW BEGIN
+CREATE TRIGGER `check_buyturn_before_insert` BEFORE
+INSERT ON `
+products`
+FOR
+EACH
+ROW
+BEGIN
   IF NEW.buyturn < 0 THEN
-    SET NEW.buyturn = 0;
-  END IF;
+  SET NEW
+  .buyturn = 0;
+END
+IF;
 END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `check_buyturn_before_update` BEFORE UPDATE ON `products` FOR EACH ROW BEGIN
+CREATE TRIGGER `check_buyturn_before_update` BEFORE
+UPDATE ON `products` FOR EACH ROW
+BEGIN
   IF NEW.buyturn < 0 THEN
-    SET NEW.buyturn = 0;
-  END IF;
+  SET NEW
+  .buyturn = 0;
+END
+IF;
 END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `check_oldprice_before_insert` BEFORE INSERT ON `products` FOR EACH ROW BEGIN
+CREATE TRIGGER `check_oldprice_before_insert` BEFORE
+INSERT ON `
+products`
+FOR
+EACH
+ROW
+BEGIN
   IF NEW.oldprice < 0 THEN
-    SET NEW.oldprice = 0;
-  END IF;
+  SET NEW
+  .oldprice = 0;
+END
+IF;
 END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `check_oldprice_before_update` BEFORE UPDATE ON `products` FOR EACH ROW BEGIN
+CREATE TRIGGER `check_oldprice_before_update` BEFORE
+UPDATE ON `products` FOR EACH ROW
+BEGIN
   IF NEW.oldprice < 0 THEN
-    SET NEW.oldprice = 0;
-  END IF;
+  SET NEW
+  .oldprice = 0;
+END
+IF;
 END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `check_price_before_insert` BEFORE INSERT ON `products` FOR EACH ROW BEGIN
+CREATE TRIGGER `check_price_before_insert` BEFORE
+INSERT ON `
+products`
+FOR
+EACH
+ROW
+BEGIN
   IF NEW.price < 0 THEN
-    SET NEW.price = 0;
-  END IF;
+  SET NEW
+  .price = 0;
+END
+IF;
 END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `check_price_before_update` BEFORE UPDATE ON `products` FOR EACH ROW BEGIN
+CREATE TRIGGER `check_price_before_update` BEFORE
+UPDATE ON `products` FOR EACH ROW
+BEGIN
   IF NEW.price < 0 THEN
-    SET NEW.price = 0;
-  END IF;
+  SET NEW
+  .price = 0;
+END
+IF;
 END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `check_quantity_before_insert` BEFORE INSERT ON `products` FOR EACH ROW BEGIN
+CREATE TRIGGER `check_quantity_before_insert` BEFORE
+INSERT ON `
+products`
+FOR
+EACH
+ROW
+BEGIN
   IF NEW.quantity < 0 THEN
-    SET NEW.quantity = 0;
-  END IF;
+  SET NEW
+  .quantity = 0;
+END
+IF;
 END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `check_quantity_before_update` BEFORE UPDATE ON `products` FOR EACH ROW BEGIN
+CREATE TRIGGER `check_quantity_before_update` BEFORE
+UPDATE ON `products` FOR EACH ROW
+BEGIN
   IF NEW.quantity < 0 THEN
-    SET NEW.quantity = 0;
-  END IF;
+  SET NEW
+  .quantity = 0;
+END
+IF;
 END
 $$
 DELIMITER ;
@@ -305,27 +413,31 @@ DELIMITER ;
 -- Table structure for table `SequelizeMeta`
 --
 
-CREATE TABLE `SequelizeMeta` (
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL
+CREATE TABLE `SequelizeMeta`
+(
+  `name` varchar
+(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `SequelizeMeta`
 --
 
-INSERT INTO `SequelizeMeta` (`name`) VALUES
-('20250403073356-create-user.js'),
-('20250403153714-update-users-table-defaults.js'),
-('20250403155809-create-category.js'),
-('20250403160952-create-brand.js'),
-('20250403161426-create-news.js'),
-('20250403161427-create-banner.js'),
-('20250403164117-create-order.js'),
-('20250404044225-create-product.js'),
-('20250404081712-create-order-detail.js'),
-('20250404084043-create-banner-detail.js'),
-('20250404092018-create-feedback.js'),
-('20250404093537-create-news-detail.js');
+INSERT INTO `SequelizeMeta` (`
+name`)
+VALUES
+  ('20250403073356-create-user.js'),
+  ('20250403153714-update-users-table-defaults.js'),
+  ('20250403155809-create-category.js'),
+  ('20250403160952-create-brand.js'),
+  ('20250403161426-create-news.js'),
+  ('20250403161427-create-banner.js'),
+  ('20250403164117-create-order.js'),
+  ('20250404044225-create-product.js'),
+  ('20250404081712-create-order-detail.js'),
+  ('20250404084043-create-banner-detail.js'),
+  ('20250404092018-create-feedback.js'),
+  ('20250404093537-create-news-detail.js');
 
 -- --------------------------------------------------------
 
@@ -333,14 +445,22 @@ INSERT INTO `SequelizeMeta` (`name`) VALUES
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `role` int(11) DEFAULT NULL,
-  `avatar` varchar(255) DEFAULT NULL,
-  `phone` int(11) DEFAULT NULL,
+CREATE TABLE `users`
+(
+  `id` int
+(11) NOT NULL,
+  `email` varchar
+(255) NOT NULL,
+  `password` varchar
+(255) DEFAULT NULL,
+  `name` varchar
+(255) DEFAULT NULL,
+  `role` int
+(11) DEFAULT NULL,
+  `avatar` varchar
+(255) DEFAULT NULL,
+  `phone` int
+(11) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -353,89 +473,116 @@ CREATE TABLE `users` (
 -- Indexes for table `banners`
 --
 ALTER TABLE `banners`
-  ADD PRIMARY KEY (`id`);
+ADD PRIMARY KEY
+(`id`);
 
 --
 -- Indexes for table `banner_details`
 --
 ALTER TABLE `banner_details`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `product_id` (`product_id`),
-  ADD KEY `banner_id` (`banner_id`);
+ADD PRIMARY KEY
+(`id`),
+ADD KEY `product_id`
+(`product_id`),
+ADD KEY `banner_id`
+(`banner_id`);
 
 --
 -- Indexes for table `brands`
 --
 ALTER TABLE `brands`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+ADD PRIMARY KEY
+(`id`),
+ADD UNIQUE KEY `name`
+(`name`);
 
 --
 -- Indexes for table `categories`
 --
 ALTER TABLE `categories`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+ADD PRIMARY KEY
+(`id`),
+ADD UNIQUE KEY `name`
+(`name`);
 
 --
 -- Indexes for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `product_id` (`product_id`),
-  ADD KEY `user_id` (`user_id`);
+ADD PRIMARY KEY
+(`id`),
+ADD KEY `product_id`
+(`product_id`),
+ADD KEY `user_id`
+(`user_id`);
 
 --
 -- Indexes for table `news`
 --
 ALTER TABLE `news`
-  ADD PRIMARY KEY (`id`);
+ADD PRIMARY KEY
+(`id`);
 
 --
 -- Indexes for table `news_details`
 --
 ALTER TABLE `news_details`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `product_id` (`product_id`),
-  ADD KEY `news_id` (`news_id`);
+ADD PRIMARY KEY
+(`id`),
+ADD KEY `product_id`
+(`product_id`),
+ADD KEY `news_id`
+(`news_id`);
 
 --
 -- Indexes for table `orders`
 --
 ALTER TABLE `orders`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+ADD PRIMARY KEY
+(`id`),
+ADD KEY `user_id`
+(`user_id`);
 
 --
 -- Indexes for table `order_details`
 --
 ALTER TABLE `order_details`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `order_id` (`order_id`),
-  ADD KEY `product_id` (`product_id`);
+ADD PRIMARY KEY
+(`id`),
+ADD KEY `order_id`
+(`order_id`),
+-- ADD KEY `product_id` (`product_id`);
 
 --
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `brand_id` (`brand_id`),
-  ADD KEY `category_id` (`category_id`);
+ADD PRIMARY KEY
+(`id`),
+ADD UNIQUE KEY `name`
+(`name`),
+ADD KEY `brand_id`
+(`brand_id`),
+ADD KEY `category_id`
+(`category_id`);
 
 --
 -- Indexes for table `SequelizeMeta`
 --
 ALTER TABLE `SequelizeMeta`
-  ADD PRIMARY KEY (`name`),
-  ADD UNIQUE KEY `name` (`name`);
+ADD PRIMARY KEY
+(`name`),
+ADD UNIQUE KEY `name`
+(`name`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+ADD PRIMARY KEY
+(`id`),
+ADD UNIQUE KEY `email`
+(`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -445,67 +592,78 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `banners`
 --
 ALTER TABLE `banners`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `banner_details`
 --
 ALTER TABLE `banner_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `news_details`
 --
 ALTER TABLE `news_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int
+(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -515,42 +673,64 @@ ALTER TABLE `users`
 -- Constraints for table `banner_details`
 --
 ALTER TABLE `banner_details`
-  ADD CONSTRAINT `banner_details_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
-  ADD CONSTRAINT `banner_details_ibfk_2` FOREIGN KEY (`banner_id`) REFERENCES `banners` (`id`);
+ADD CONSTRAINT `banner_details_ibfk_1` FOREIGN KEY
+(`product_id`) REFERENCES `products`
+(`id`),
+ADD CONSTRAINT `banner_details_ibfk_2` FOREIGN KEY
+(`banner_id`) REFERENCES `banners`
+(`id`);
 
 --
 -- Constraints for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
-  ADD CONSTRAINT `feedbacks_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
-  ADD CONSTRAINT `feedbacks_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ADD CONSTRAINT `feedbacks_ibfk_1` FOREIGN KEY
+(`product_id`) REFERENCES `products`
+(`id`),
+ADD CONSTRAINT `feedbacks_ibfk_2` FOREIGN KEY
+(`user_id`) REFERENCES `users`
+(`id`);
 
 --
 -- Constraints for table `news_details`
 --
 ALTER TABLE `news_details`
-  ADD CONSTRAINT `news_details_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
-  ADD CONSTRAINT `news_details_ibfk_2` FOREIGN KEY (`news_id`) REFERENCES `news` (`id`);
+ADD CONSTRAINT `news_details_ibfk_1` FOREIGN KEY
+(`product_id`) REFERENCES `products`
+(`id`),
+ADD CONSTRAINT `news_details_ibfk_2` FOREIGN KEY
+(`news_id`) REFERENCES `news`
+(`id`);
 
 --
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY
+(`user_id`) REFERENCES `users`
+(`id`);
 
 --
 -- Constraints for table `order_details`
 --
 ALTER TABLE `order_details`
-  ADD CONSTRAINT `order_details_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
-  ADD CONSTRAINT `order_details_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+ADD CONSTRAINT `order_details_ibfk_1` FOREIGN KEY
+(`order_id`) REFERENCES `orders`
+(`id`),
+ADD CONSTRAINT `order_details_ibfk_2` FOREIGN KEY
+(`product_id`) REFERENCES `products`
+(`id`);
 
 --
 -- Constraints for table `products`
 --
 ALTER TABLE `products`
-  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`),
-  ADD CONSTRAINT `products_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
+ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY
+(`brand_id`) REFERENCES `brands`
+(`id`),
+ADD CONSTRAINT `products_ibfk_2` FOREIGN KEY
+(`category_id`) REFERENCES `categories`
+(`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

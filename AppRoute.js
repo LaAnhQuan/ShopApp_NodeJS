@@ -141,7 +141,7 @@ router.delete('/order-details/:id',
 router.get('/carts', asyncHandler(CartController.getCarts));
 router.get('/carts/:id', asyncHandler(CartController.getCartById));
 router.post('/carts',
-    requireRoles([UserRole.Admin]),
+    requireRoles([UserRole.Admin, UserRole.User]),
     validate(InsertCartRequest),
     asyncHandler(CartController.insertCart));
 router.post('/carts/checkout', asyncHandler(CartController.checkoutCart));
@@ -156,7 +156,7 @@ router.get('/cart-items', asyncHandler(CartItemController.getCartItems));
 router.get('/cart-items/:id', asyncHandler(CartItemController.getCartItemById));
 router.get('/cart-items/carts/:cart_id', asyncHandler(CartItemController.getCartItemsByCartId));
 router.post('/cart-items',
-    requireRoles([UserRole.User]),
+    requireRoles([UserRole.User, UserRole.Admin]),
     validate(InsertCartItemRequest),
     asyncHandler(CartItemController.insertCartItem));
 router.put('/cart-items/:id',

@@ -19,7 +19,16 @@ module.exports = {
                 where: whereClause,
                 include: [{
                     model: db.CartItem,
-                    as: 'cart_items'
+                    as: 'cart_items',
+                    include: [{
+                        model: db.ProductVariantValue,
+                        as: 'product_variant_values',  // Alias cần phải khớp với alias trong mối quan hệ
+                        include: [{
+                            model: db.Product,
+                            as: 'product',  // Alias cho bảng Product
+                            attributes: ['id', 'name', 'image', 'description']
+                        }]
+                    }]
                 }],
                 limit: pageSize,
                 offset: offset
@@ -38,12 +47,22 @@ module.exports = {
         });
     },
 
+
     getCartById: async (req, res) => {
         const { id } = req.params;
         const cart = await db.Cart.findByPk(id, {
             include: [{
                 model: db.CartItem,
-                as: 'cart_items'
+                as: 'cart_items',
+                include: [{
+                    model: db.ProductVariantValue,
+                    as: 'product_variant_values',  // Alias cần phải khớp với alias trong mối quan hệ
+                    include: [{
+                        model: db.Product,
+                        as: 'product',
+                        attributes: ['id', 'name', 'image', 'description']
+                    }]
+                }]
             }]
         });
 
@@ -57,11 +76,12 @@ module.exports = {
             message: 'Get cart information successfully',
             data: cart
         });
-    },
-
+    }
+    ,
 
     insertCart: async (req, res) => {
         const { session_id, user_id } = req.body;
+        console.log(">>> check req.body", req.body.user_id)
 
         // Ensure only one of session_id or user_id is provided
         if ((session_id && user_id) || (!session_id && !user_id)) {
@@ -75,11 +95,12 @@ module.exports = {
             where: {
                 [Op.or]: [
                     { session_id: session_id ? session_id : null },
-                    { user_id: user_id ? user_id : null },
+                    { user_id: req.body.user_id ? user_id : null },
                 ],
             },
         });
 
+        console.log("check >>> ", existingCart);
         if (existingCart) {
             // If a cart with the same session_id exists, send an error response
             return res.status(409).json({
@@ -92,78 +113,90 @@ module.exports = {
             message: 'Create cart successfully',
             data: cart
         });
-
     },
 
     checkoutCart: async (req, res) => {
-        const { cart_id, total, note } = req.body;
-        const transaction = await db.sequelize.transaction();
+        const { cart_id, phone, note, address } = req.body;
+        const transaction = await db.sequelize.transaction();  // Khởi tạo transaction
 
         try {
-            // Verify the cart exists and has items
+            // Lấy thông tin giỏ hàng
             const cart = await db.Cart.findByPk(cart_id, {
                 include: [{
                     model: db.CartItem,
                     as: 'cart_items',
+                    attributes: ['product_variant_id', 'quantity'],  // Chỉ lấy các trường này
                     include: [{
-                        model: db.Product,
-                        as: 'product'
+                        model: db.ProductVariantValue,
+                        as: 'product_variant_values',  // Alias cho liên kết với ProductVariantValue
+                        include: [{
+                            model: db.Product,
+                            as: 'product',  // Alias cho liên kết với Product
+                            attributes: ['id', 'name', 'image', 'description']  // Chỉ lấy các trường cần thiết từ Product
+                        }]
                     }]
                 }]
             });
 
             if (!cart || !cart.cart_items.length) {
-                return res.status(404).json({ message: 'Cart does not exist or is empty.' });
+                return res.status(404).json({
+                    message: 'Cart does not exist or is empty'
+                });
             }
 
-            // Create an order
-            const newOrder = await db.Order.create(
-                {
-                    user_id: cart.user_id, // assuming cart model has user_id
-                    session_id: cart.session_id, // assuming cart model has session_id
-                    status: OrderStatus.PENDING,
-                    total: total || cart.cart_items.reduce((acc, item) => acc + item.quantity * item.product.price, 0),
-                    note: note,
-                },
-                { transaction: transaction }
-            );
+            // Tính tổng giá trị không được cung cấp
+            const calculatedTotal = cart.cart_items.reduce((acc, item) => {
+                acc += item.quantity * item.product_variant_values.price;  // Sửa theo alias đúng
+                return acc;
+            }, 0);
 
-            // Insert cart items to order_details
-            for (let item of cart.cart_items) {
-                await db.OrderDetail.create(
-                    {
-                        order_id: newOrder.id,
-                        product_id: item.product_id,
-                        quantity: item.quantity,
-                        price: item.product.price, // assuming join to fetch product details
-                    },
-                    { transaction: transaction }
-                );
+            // Tạo đơn hàng mới
+            const newOrder = await db.Order.create({
+                user_id: cart.user_id || null,  // Giả định cart có user_id
+                session_id: cart.session_id || null,  // Giả định cart có session_id
+                status: OrderStatus.PENDING,  // Trạng thái đơn hàng
+                total: calculatedTotal,  // Dùng tổng giá trị được tính
+                note: note || '',  // Ghi chú
+                phone: phone,
+                address: address,
+            }, { transaction });
+
+            // Chèn thông tin chi tiết vào bảng order_details
+            for (const item of cart.cart_items) {
+                await db.OrderDetail.create({
+                    order_id: newOrder.id,
+                    product_variant_id: item.product_variant_values.id,  // Sử dụng product_variant_id
+                    quantity: item.quantity,
+                    price: item.product_variant_values.price  // Giá của sản phẩm biến thể
+                }, { transaction });
             }
 
-            // Delete cart items
-            await db.CartItem.destroy(
-                {
-                    where: { cart_id: cart.id },
-                },
-                { transaction: transaction }
-            );
+            // Xóa các mục trong giỏ hàng
+            await db.CartItem.destroy({
+                where: { cart_id: cart_id },
+                transaction
+            });
 
-            // Delete the cart
-            await cart.destroy({ transaction: transaction });
-            // add 3rd module(eg: vnpay,...);
-            // Commit the transaction
+            // Xóa giỏ hàng
+            await cart.destroy({ transaction });
+
+            // Thêm tích hợp thanh toán (ví dụ: VNPay...)
+            // Có thể tích hợp thêm các bước thanh toán vào module thanh toán sử dụng
+
+            // Xác nhận transaction thành công
             await transaction.commit();
+
             res.status(201).json({
-                message: 'Checkout successful.',
+                message: 'Cart checkout successful',
                 data: newOrder
             });
+
         } catch (error) {
-            // Rollback the transaction on error
+            // Rollback transaction khi có lỗi
             await transaction.rollback();
             res.status(500).json({
-                message: 'Checkout failed.',
-                error: error.message,
+                message: 'Cart checkout error',
+                error: error.message
             });
         }
     },
@@ -184,6 +217,5 @@ module.exports = {
                 message: 'Cart not found'
             });
         }
-
     }
 };
