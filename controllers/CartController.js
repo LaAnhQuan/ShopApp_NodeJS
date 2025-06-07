@@ -50,7 +50,8 @@ module.exports = {
 
     getCartById: async (req, res) => {
         const { id } = req.params;
-        const cart = await db.Cart.findByPk(id, {
+        const cart = await db.Cart.findOne({
+            where: { user_id: id },
             include: [{
                 model: db.CartItem,
                 as: 'cart_items',

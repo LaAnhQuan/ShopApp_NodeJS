@@ -36,14 +36,15 @@ import InsertCartRequest from './dtos/requests/cart/InsertCartRequest'
 
 import { requireRoles } from './middlewares/jwtMiddleware'
 import { UserRole } from './constants'
+import delayMiddleware from './middlewares/delayMiddleware'
 const router = express.Router()
 
 
 // User Routes
 router.post('/users/register',
-    validate(InsertUserRequest),
     asyncHandler(UserController.registerUser))
 router.post('/users/login',
+    delayMiddleware,
     validate(LoginUserRequest),
     asyncHandler(UserController.login))
 router.post('/users/me/:id',
@@ -53,9 +54,24 @@ router.post('/users/:id',
     requireRoles([UserRole.User, UserRole.Admin]),
     asyncHandler(UserController.updateUser))
 
+router.put('/users/:id/profile',
+    requireRoles([UserRole.User, UserRole.Admin]),
+    asyncHandler(UserController.updateProfile));
+router.put('/users/:id/password',
+    requireRoles([UserRole.User, UserRole.Admin]),
+    asyncHandler(UserController.changePassword));
+
+router.get('/users',
+    delayMiddleware,
+    requireRoles([UserRole.User, UserRole.Admin]),
+    asyncHandler(UserController.fetchUser))
 // Product Routes
-router.get('/products', asyncHandler(ProductController.getProducts))
-router.get('/products/:id', asyncHandler(ProductController.getProductById))
+router.get('/products',
+    delayMiddleware,
+    asyncHandler(ProductController.getProducts))
+router.get('/products/:id',
+    delayMiddleware,
+    asyncHandler(ProductController.getProductById))
 router.post('/products',
     requireRoles([UserRole.Admin]),
     validateImageExists,

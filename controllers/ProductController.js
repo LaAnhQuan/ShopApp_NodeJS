@@ -9,9 +9,18 @@ import attribute from "../models/attribute";
 
 module.exports = {
     getProducts: async (req, res) => {
-        const { search = '', page = 1 } = req.query;
-        const pageSize = 5;
-        const offset = (page - 1) * pageSize;
+        // const { search = '', page = 1 } = req.query;
+        // const pageSize = 5;
+        // const offset = (page - 1) * pageSize;
+
+        const { search = '', page, pageSize } = req.query;
+
+        // Nếu không truyền page hoặc pageSize thì sẽ không phân trang
+        const isPaginationEnabled = page && pageSize;
+
+        const limit = isPaginationEnabled ? parseInt(pageSize) : undefined;
+        const offset = isPaginationEnabled ? (parseInt(page) - 1) * parseInt(pageSize) : undefined;
+
 
         let whereClause = {};
         let attributeWhereClause = {};
@@ -30,21 +39,44 @@ module.exports = {
             };
         }
 
-        // Tìm tổng số sản phẩm thỏa điều kiện, bao gồm cả tìm theo attribute
+        // // Tìm tổng số sản phẩm thỏa điều kiện, bao gồm cả tìm theo attribute
+        // const [products, totalProducts] = await Promise.all([
+        //     db.Product.findAll({
+        //         where: whereClause,
+        //         include: [{
+        //             model: db.ProductAttributeValue,
+        //             as: 'product_attribute_values',
+        //             include: [{ model: db.Attribute, as: 'attribute' }],
+        //             where: attributeWhereClause,
+        //             required: false
+        //         }],
+        //         limit: pageSize,
+        //         offset,
+        //         // order: [['created_at', 'DESC']]
+        //     }),
+        //     db.Product.count({ where: whereClause })
+        // ]);
+
+
+
+        const productQuery = {
+            where: whereClause,
+            include: [{
+                model: db.ProductAttributeValue,
+                as: 'product_attribute_values',
+                include: [{ model: db.Attribute, as: 'attribute' }],
+                where: attributeWhereClause,
+                required: false
+            }]
+        };
+
+        if (isPaginationEnabled) {
+            productQuery.limit = limit;
+            productQuery.offset = offset;
+        }
+
         const [products, totalProducts] = await Promise.all([
-            db.Product.findAll({
-                where: whereClause,
-                include: [{
-                    model: db.ProductAttributeValue,
-                    as: 'product_attribute_values',
-                    include: [{ model: db.Attribute, as: 'attribute' }],
-                    where: attributeWhereClause,
-                    required: false
-                }],
-                limit: pageSize,
-                offset,
-                order: [['created_at', 'DESC']]
-            }),
+            db.Product.findAll(productQuery),
             db.Product.count({ where: whereClause })
         ]);
 
@@ -52,11 +84,11 @@ module.exports = {
             message: 'Get list product successfully',
             data: products.map(product => ({
                 ...product.get({ plain: true }),
-                image: getAvatarURL(product.image),
-                attributes: product.product_attribute_values.map(attr => ({
-                    name: attr.attribute?.name || null,
-                    value: attr.value
-                }))
+                // image: getAvatarURL(product.image),
+                // attributes: product.product_attribute_values.map(attr => ({
+                //     name: attr.attribute?.name || null,
+                //     value: attr.value
+                // }))
             })),
             currentPage: parseInt(page, 10),
             totalPages: Math.ceil(totalProducts / pageSize),
@@ -70,6 +102,11 @@ module.exports = {
         const { id } = req.params;  // Lấy id từ params trong URL
         const product = await db.Product.findByPk(id, {
             include: [
+                {
+                    model: db.ProductImage,
+                    as: 'product_images',
+                    attributes: ['id', 'image_url'],
+                },
                 {
                     model: db.ProductAttributeValue, //Bao gồm thuocj tính động
                     as: 'product_attribute_values',
@@ -126,6 +163,8 @@ module.exports = {
             const productData = {
                 id: product.id,
                 name: product.name,
+                price: product.price,
+                oldprice: product.oldprice,
                 description: product.description,
                 rating: product.rating,
                 total_ratings: product.total_ratings,
@@ -141,8 +180,8 @@ module.exports = {
                 data: {
                     ...productData, // Dùng lại object đã chuẩn bị
 
-                    image: getAvatarURL(product.image),
-                    product_images: product.product_images?.map(img => getAvatarURL(img.image_url)) || [],
+                    image: product.image,
+                    product_images: product.product_images?.map(img => img.image_url) || [],
 
                     attributes: product.product_attribute_values.map(attrVal => ({
                         id: attrVal.id,

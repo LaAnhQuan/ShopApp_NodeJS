@@ -11,6 +11,16 @@ import { getAvatarURL } from "../helpers/imageHelper";
 require('dotenv').config();
 
 
+const findUserByEmail = async (email) => {
+    if (!email) return null; // Nếu không có email thì trả về null ngay lập tức
+    return await db.User.findOne({ where: { email } });
+};
+
+const findUserByPhone = async (phone) => {
+    if (!phone) return null; // Nếu không có phone thì trả về null ngay lập tức
+    return await db.User.findOne({ where: { phone } });
+};
+
 module.exports = {
     registerUser: async (req, res) => {
         const { email, phone, password } = req.body;
@@ -20,17 +30,41 @@ module.exports = {
                 message: 'Please provide email or phone number'
             })
         }
-        // Check for existing user by email or phone
-        const condition = {};
-        if (email) condition.email = email;
-        if (phone) condition.phone = phone;
-
-        const existingUser = await db.User.findOne({ where: condition });
-        if (existingUser) {
-            return res.status(409).json({
-                message: 'Email or phone number already exists'
-            });
+        if (!password) {
+            return res.status(400).json({
+                message: 'Password is not allow'
+            })
         }
+        // Kiểm tra email
+        if (email) {
+            const existingUserByEmail = await findUserByEmail(email);
+            if (existingUserByEmail) {
+                return res.status(409).json({
+                    message: 'Email or phone number already exists'
+                });
+            }
+        }
+
+        // Kiểm tra phone
+        if (phone) {
+            const existingUserByPhone = await findUserByPhone(phone);
+            if (existingUserByPhone) {
+                return res.status(409).json({
+                    message: 'Email or phone number already exists'
+                });
+            }
+        }
+        // // Check for existing user by email or phone
+        // const condition = {};
+        // if (email) condition.email = email;
+        // if (phone) condition.phone = phone;
+
+        // const existingUser = await db.User.findOne({ where: condition });
+        // if (existingUser) {
+        //     return res.status(409).json({
+        //         message: 'Email or phone number already exists'
+        //     });
+        // }
         const hashedPassword = password ? await argon2.hash(password) : null;
         // Create user 
         const user = await db.User.create({
@@ -79,19 +113,16 @@ module.exports = {
         }
 
         // Generate a JWT token
-
         const token = jwt.sign(
             {
-                id: user.id, //most important
-                //role: user.role
-                iat: Math.floor(Date.now() / 1000) // Thêm thời điểm tạo token 
+                id: user.id,  // most important
+                iat: Math.floor(Date.now() / 1000) // Thêm thời điểm tạo token
             },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRATION }
         );
 
 
-        // Return user information and token
         return res.status(200).json({
             message: 'Login successful',
             data: {
@@ -100,6 +131,77 @@ module.exports = {
             }
         });
 
+    },
+
+    // logout: Viet cho toi ham logout tuong tu dua vao cac ham toi da viet san
+
+    updateProfile: async (req, res) => {
+        const { id } = req.params;
+        const { name, avatar, phone } = req.body;
+
+        if (req.user.id != id) {
+            return res.status(403).json({
+                message: `Not allowed to update another user's information`
+            });
+        }
+
+        const user = await db.User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.name = name || user.name;
+        user.avatar = avatar || user.avatar;
+        user.phone = phone || user.phone;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: 'User profile updated successfully',
+            data: user.get({ plain: true }),
+        });
+    },
+
+    changePassword: async (req, res) => {
+        const { id } = req.params;
+        const { old_password, new_password, confirm_new_password } = req.body;
+
+        if (req.user.id != id) {
+            return res.status(403).json({
+                message: `Not allowed to change another user's password`
+            });
+        }
+
+        if (!old_password || !new_password || !confirm_new_password) {
+            return res.status(400).json({
+                message: 'Old password, new password, and password confirmation are required'
+            });
+        }
+
+        if (new_password !== confirm_new_password) {
+            return res.status(400).json({
+                message: 'New password and confirmation do not match'
+            });
+        }
+
+        const user = await db.User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const passwordValid = await argon2.verify(user.password, old_password);
+        if (!passwordValid) {
+            return res.status(401).json({ message: 'Old password is incorrect' });
+        }
+
+        user.password = await argon2.hash(new_password);
+        user.password_changed_at = new Date();
+
+        await user.save();
+
+        return res.status(200).json({
+            message: 'Password changed successfully'
+        });
     },
 
     updateUser: async (req, res) => {
@@ -150,8 +252,9 @@ module.exports = {
         return res.status(200).json({
             message: 'User updated successfully',
             data: {
+
                 ...user.get({ plain: true }), // Lấy thông tin người dùng và loại bỏ metadata của Sequelize
-                avatar: getAvatarURL(user.avatar)
+                // avatar: getAvatarURL(user.avatar)
             }
         });
     },
@@ -184,4 +287,13 @@ module.exports = {
             }
         });
     },
+
+    fetchUser: async (req, res) => {
+        const user = req.user;
+
+        return res.status(200).json({
+            message: 'User info retrieved successfully',
+            data: new ResponseUser(user)
+        });
+    }
 }

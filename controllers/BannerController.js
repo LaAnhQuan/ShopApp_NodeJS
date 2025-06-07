@@ -32,7 +32,7 @@ module.exports = {
             message: 'Get banners successfully',
             data: banners.map(banner => ({
                 ...banner.get({ plain: true }), // Chuyển đổi Sequelize instance thành plain object
-                image: getAvatarURL(banner.image) // Áp dụng hàm getAvatarURL cho trường image
+                // image: getAvatarURL(banner.image) // Áp dụng hàm getAvatarURL cho trường image
             })),
             current_page: parseInt(page, 10),
             total_page: Math.ceil(totalBanners / pageSize),

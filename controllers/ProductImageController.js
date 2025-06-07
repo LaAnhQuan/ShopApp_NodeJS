@@ -32,7 +32,7 @@ module.exports = {
             // data: productImages,
             data: productImages.map(productImage => ({
                 ...productImage.get({ plain: true }),
-                image_url: getAvatarURL(productImage.image_url)
+                image_url: productImage.image_url
             })),
             current_page: page,
             total_page: Math.ceil(totalProductImages / pageSize),
@@ -54,7 +54,7 @@ module.exports = {
             message: "Get product image successfully",
             data: {
                 ...productImage.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
-                image_url: getAvatarURL(productImage.image_url) // Định dạng URL của ảnh
+                image_url: productImage.image_url // Định dạng URL của ảnh
             }
         });
 
@@ -70,6 +70,13 @@ module.exports = {
                 message: "Product is not found"
             })
         }
+
+
+        // Neu truong product.image trong thi cap nhat no bang image_url
+        if (!product.image || product.image.trim() === "") {
+            await product.update({ image: image_url });
+        }
+
 
         //Kiem tra xem cap product_id va image_url da ton tai trong bang productImage hay chua
         const existingImage = await db.ProductImage.findOne({
@@ -90,7 +97,7 @@ module.exports = {
             message: "Insert product image successfully",
             data: {
                 ...productImage.get({ plain: true }), // Chuyển Sequelize instance thành đối tượng thuần
-                image_url: getAvatarURL(productImage.image_url) // Định dạng URL của ảnh
+                image_url: productImage.image_url
             }
         });
 
