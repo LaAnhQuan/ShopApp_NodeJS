@@ -44,7 +44,7 @@ module.exports = {
 
     getOrderById: async (req, res) => {
         const { id } = req.params;
-        const order = await db.Order.findByPk(id, {
+        const order = await db.Order.findAll(id, {
             include: [{
                 model: db.OrderDetail,
                 as: 'order_details' // 'orderDetails' should match the alias used in the association
@@ -63,6 +63,27 @@ module.exports = {
         });
 
     },
+    getOrderByUserId: async (req, res) => {
+        const { user_id } = req.params;
+        const order = await db.Order.findAll(
+            {
+                where: { user_id: user_id },
+            }
+        );
+
+        if (!order) {
+            return res.status(404).json({
+                message: 'Order not found'
+            });
+        }
+
+        res.status(200).json({
+            message: 'Order information retrieved successfully',
+            data: order
+        });
+
+    },
+
 
     /*
     insertOrder: async (req, res) => {
@@ -128,4 +149,65 @@ module.exports = {
             });
         }
     },
+
+    buyNow: async (req, res) => {
+        const { user_id, product_variant_id, quantity, phone, address, note } = req.body;
+
+        const transaction = await db.sequelize.transaction();
+
+        try {
+            // Lấy thông tin sản phẩm biến thể
+            const productVariant = await db.ProductVariantValue.findByPk(product_variant_id, {
+                include: [{
+                    model: db.Product,
+                    as: 'product',
+                    attributes: ['id', 'name', 'image', 'description']
+                }]
+            });
+
+            if (!productVariant) {
+                return res.status(404).json({
+                    message: 'Product variant not found'
+                });
+            }
+
+            // Tính tổng giá
+            const totalPrice = productVariant.price * quantity;
+
+            // Tạo đơn hàng
+            const newOrder = await db.Order.create({
+                user_id: user_id,  // nếu có đăng nhập
+                session_id: req.sessionID || null,       // nếu có session
+                status: OrderStatus.PENDING,
+                total: totalPrice,
+                note: note || '',
+                phone: phone,
+                address: address
+            }, { transaction });
+
+            // Tạo chi tiết đơn hàng
+            await db.OrderDetail.create({
+                order_id: newOrder.id,
+                product_variant_id: product_variant_id,
+                quantity: quantity,
+                price: productVariant.price
+            }, { transaction });
+
+            // Commit
+            await transaction.commit();
+
+            res.status(201).json({
+                message: 'Buy now successful',
+                data: newOrder
+            });
+
+        } catch (error) {
+            await transaction.rollback();
+            res.status(500).json({
+                message: 'Buy now error',
+                error: error.message
+            });
+        }
+    },
+
 }

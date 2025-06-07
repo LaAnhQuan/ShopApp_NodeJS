@@ -129,14 +129,19 @@ router.delete('/brands/:id',
 // Order Routes
 router.get('/orders', asyncHandler(OrderController.getOrders))
 router.get('/orders/:id', asyncHandler(OrderController.getOrderById))
+router.get('/orders/user/:user_id',
+    asyncHandler(OrderController.getOrderByUserId))
 /*
 router.post('/orders',
     validate(InsertOrderRequest),
     asyncHandler(OrderController.insertOrder))
 */
+router.post('/orders',
+    asyncHandler(OrderController.buyNow)
+)
 router.put('/orders/:id',
     validate(UpdateOrderRequest),
-    asyncHandler(OrderController.updateOrder))
+    asyncHandler(OrderController.getOrderById))
 router.delete('/orders/:id',
     requireRoles([UserRole.Admin, UserRole.User]),
     requireRoles([UserRole.Admin]),
@@ -145,6 +150,7 @@ router.delete('/orders/:id',
 // OrderDetail Routes
 router.get('/order-details', asyncHandler(OrderDetailController.getOrderDetails))
 router.get('/order-details/:id', asyncHandler(OrderDetailController.getOrderDetailById))
+router.get('/order-details/order/:order_id', asyncHandler(OrderDetailController.getOrderDetailByOrderId))
 router.post('/order-details',
     requireRoles([UserRole.Admin]),
     asyncHandler(OrderDetailController.insertOrderDetail))
