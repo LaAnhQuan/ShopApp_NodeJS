@@ -197,14 +197,14 @@ module.exports = {
             await transaction.commit();
 
             res.status(201).json({
-                message: 'Buy now successful',
+                message: 'Buy product successful',
                 data: newOrder
             });
 
         } catch (error) {
             await transaction.rollback();
             res.status(500).json({
-                message: 'Buy now error',
+                message: 'Buy product error',
                 error: error.message
             });
         }
