@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Product.belongsTo(models.Brand, {
         foreignKey: 'brand_id',
+        as: 'brand',
       })
       Product.belongsTo(models.Category, {
         foreignKey: 'category_id',

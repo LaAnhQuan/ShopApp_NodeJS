@@ -13,6 +13,7 @@ import * as ImageController from './controllers/ImageController'
 import * as ProductImageController from './controllers/ProductImageController'
 import * as CartItemController from './controllers/CartItemController'
 import * as CartController from './controllers/CartController'
+import * as GoogleController from './controllers/social/GoogleController'
 
 import asyncHandler from './middlewares/asyncHandler'
 import validateImageExists from './middlewares/validateImageExists'
@@ -87,6 +88,10 @@ router.delete('/products/:id',
     requireRoles([UserRole.Admin]),
     asyncHandler(ProductController.deleteProduct))
 
+router.get('/products/category/:category_id',
+    asyncHandler(ProductController.getProductByCategory_id)
+)
+
 // ProductImage Routes
 router.get('/product-images', asyncHandler(ProductImageController.getProductImages));
 router.get('/product-images/:id', asyncHandler(ProductImageController.getProductImageById));
@@ -111,6 +116,7 @@ router.put('/categories/:id',
 router.delete('/categories/:id',
     requireRoles([UserRole.Admin]),
     asyncHandler(CategoryController.deleteCategory))
+router.get('/product/categories', asyncHandler(CategoryController.getProductByNameCategory))
 
 // Brand Routes
 router.get('/brands', asyncHandler(BrandController.getBrands))
@@ -257,3 +263,6 @@ router.delete('/images/delete',
     ImageController.deleteImage)
 router.get('/images/:fileName', asyncHandler(ImageController.viewImage))
 module.exports = router
+
+//Social Routes
+router.post('/auth/google', GoogleController.authenticateGoogle);

@@ -127,5 +127,60 @@ module.exports = {
         return res.status(200).json({
             message: 'Category updated successfully',
         })
+    },
+
+    getProductByNameCategory: async (req, res) => {
+        // Lấy tham số tìm kiếm và phân trang từ query
+        const { page = 1, search = '' } = req.query;
+        const pageSize = 5; // Số lượng item mỗi trang
+        const offset = (page - 1) * pageSize;
+
+        // Lọc theo tên (category name và product name)
+        let whereClause = {};
+        if (search) {
+            whereClause = {
+                name: {
+                    [Op.like]: `%${search}%` // Lọc tên theo chuỗi tìm kiếm (bao gồm cả dấu % để tìm kiếm kiểu chứa)
+                }
+            };
+        }
+
+        // Lấy danh mục và tất cả sản phẩm liên quan với phân trang và tìm kiếm
+        const [categories, totalCategories] = await Promise.all([
+            db.Category.findAll({
+                where: whereClause, // Sử dụng whereClause đã cập nhật
+                limit: pageSize,
+                offset: offset,
+                include: [{
+                    model: db.Product, // Kết hợp bảng Product
+                    as: 'Products', // Alias phải trùng với quan hệ đã thiết lập
+                    required: false, // Để lấy danh mục dù không có sản phẩm nào
+                    attributes: ['id', 'name', 'price', 'image'], // Chọn các trường cần thiết từ bảng Product
+                }],
+                attributes: ['id', 'name'] // Thêm id của Category vào đây
+            }),
+            db.Category.count({
+                where: whereClause // Đếm tổng số danh mục theo điều kiện lọc
+            })
+        ]);
+
+        // Trả về kết quả
+        return res.status(200).json({
+            message: 'Lấy danh mục và sản phẩm thành công',
+            data: categories.map(category => ({
+                id: category.id, // Lấy id của Category
+                name: category.name, // Lấy tên của Category
+                products: category.Products.map(product => ({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image
+                }))
+            })),
+            current_page: parseInt(page, 10),
+            total_page: Math.ceil(totalCategories / pageSize),
+            total: totalCategories
+        });
     }
+
 }

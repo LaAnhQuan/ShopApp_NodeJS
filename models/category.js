@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Category.hasMany(models.Product, {
         foreignKey: 'category_id',
+        as: 'Products'
       })
     }
   }

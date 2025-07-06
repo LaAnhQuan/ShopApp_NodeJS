@@ -471,4 +471,49 @@ module.exports = {
         return res.status(200).json({ message: 'Product updated successfully' });
     },
 
+    getProductByCategory_id: async (req, res) => {
+        const { category_id } = req.params;  // Lấy category_id từ params trong URL
+
+
+        // Lọc các sản phẩm theo category_id và nhóm theo brand_id
+        const products = await db.Product.findAll({
+            where: { category_id }, // Lọc theo category_id
+            attributes: ['id', 'name', 'brand_id', 'price', 'description', 'image'], // Lấy các thuộc tính cần thiết
+            include: [
+                {
+                    model: db.Brand,  // Bao gồm thông tin thương hiệu
+                    as: 'brand', // Alias cho bảng Brand
+                    attributes: ['name'] // Lấy id và tên của thương hiệu
+                }
+            ]
+        });
+
+        // Nếu có sản phẩm, nhóm các sản phẩm theo brand_id
+        if (products.length > 0) {
+            // Tạo một đối tượng để nhóm sản phẩm theo brand_id
+            const groupedProducts = products.reduce((groups, product) => {
+                const brandName = product.brand.name; // Lấy tên thương hiệu
+                if (!groups[brandName]) {
+                    groups[brandName] = []; // Tạo mảng mới cho brandName nếu chưa có
+                }
+                // Thêm sản phẩm vào đúng nhóm (dựa trên brandName)
+                groups[brandName].push(product);
+                return groups;
+            }, {});
+
+            // Trả về kết quả
+            return res.status(200).json({
+                message: 'Products grouped by brand_name successfully',
+                data: groupedProducts,
+            });
+        } else {
+            return res.status(404).json({
+                message: 'No products found for this category.'
+            });
+        }
+    }
+
+
+
+
 }

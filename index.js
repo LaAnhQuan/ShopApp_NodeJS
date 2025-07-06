@@ -30,6 +30,8 @@ app.use('/api/', apiRoutes)
 //     res.send('Hello toi dey hello vn ')
 // })
 
+
+
 app.get('/api/healthcheck', async (req, res) => {
     try {
         // Kiểm tra kết nối cơ sở dữ liệu
