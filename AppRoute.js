@@ -14,6 +14,7 @@ import * as ProductImageController from './controllers/ProductImageController'
 import * as CartItemController from './controllers/CartItemController'
 import * as CartController from './controllers/CartController'
 import * as GoogleController from './controllers/social/GoogleController'
+import * as AuthController from './controllers/AuthController'
 
 import asyncHandler from './middlewares/asyncHandler'
 import validateImageExists from './middlewares/validateImageExists'
@@ -39,6 +40,12 @@ import { requireRoles } from './middlewares/jwtMiddleware'
 import { UserRole } from './constants'
 import delayMiddleware from './middlewares/delayMiddleware'
 const router = express.Router()
+
+// Auth Routes
+router.post('/auth/login', asyncHandler(AuthController.login));
+router.post('/auth/verify-otp', asyncHandler(AuthController.verifyOTP));
+router.post('/auth/register', asyncHandler(AuthController.register));
+router.post('/auth/resend-otp', asyncHandler(AuthController.resendOTP));
 
 
 // User Routes
@@ -266,3 +273,4 @@ module.exports = router
 
 //Social Routes
 router.post('/auth/google', GoogleController.authenticateGoogle);
+
