@@ -3,13 +3,22 @@ import dotenv from 'dotenv';
 import apiRoutes from './AppRoute'
 import db from "./models"
 import * as os from 'os';
-
+import { Server } from 'socket.io';
+import { createServer } from 'node:http';
+import socketHandler from './socket';
 
 //config dotenv
 dotenv.config()
 
 const app = express()
 const port = process?.env?.PORT ?? 3000;
+
+const server = createServer(app);
+const io = new Server(server, {
+    connectionStateRecovery: {}
+});
+
+socketHandler(io)
 
 // CORS headers
 app.use(function (req, res, next) {
@@ -77,7 +86,7 @@ app.get('/api/healthcheck', async (req, res) => {
 
 
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
     console.log(`Example app listening on port ${process.env.PORT}`)
 })
 

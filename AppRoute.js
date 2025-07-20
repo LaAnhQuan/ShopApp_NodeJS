@@ -15,6 +15,7 @@ import * as CartItemController from './controllers/CartItemController'
 import * as CartController from './controllers/CartController'
 import * as GoogleController from './controllers/social/GoogleController'
 import * as AuthController from './controllers/AuthController'
+import * as MessageController from './controllers/MessageController'
 
 import asyncHandler from './middlewares/asyncHandler'
 import validateImageExists from './middlewares/validateImageExists'
@@ -273,4 +274,12 @@ module.exports = router
 
 //Social Routes
 router.post('/auth/google', GoogleController.authenticateGoogle);
+
+//Chat real time 
+router.get('/messages', asyncHandler(MessageController.getMessages));
+router.get('/messages/:id', asyncHandler(MessageController.getMessageById));
+router.post('/messages', asyncHandler(MessageController.createMessage));
+router.put('/messages/:id', asyncHandler(MessageController.updateMessage));
+router.delete('/messages/:id', asyncHandler(MessageController.deleteMessage)
+);
 
