@@ -35,12 +35,6 @@ app.use(express.urlencoded({ extended: true }))
 //Khai bao router
 app.use('/api/', apiRoutes)
 
-// app.get('/', (req, res) => {
-//     res.send('Hello toi dey hello vn ')
-// })
-
-
-
 app.get('/api/healthcheck', async (req, res) => {
     try {
         // Kiểm tra kết nối cơ sở dữ liệu

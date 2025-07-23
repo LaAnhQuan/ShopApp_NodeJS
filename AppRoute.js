@@ -16,6 +16,7 @@ import * as CartController from './controllers/CartController'
 import * as GoogleController from './controllers/social/GoogleController'
 import * as AuthController from './controllers/AuthController'
 import * as MessageController from './controllers/MessageController'
+import * as ZaloPayController from './controllers/ZaloPayController'
 
 import asyncHandler from './middlewares/asyncHandler'
 import validateImageExists from './middlewares/validateImageExists'
@@ -275,11 +276,18 @@ module.exports = router
 //Social Routes
 router.post('/auth/google', GoogleController.authenticateGoogle);
 
-//Chat real time 
+//Chat_real_time Routes 
 router.get('/messages', asyncHandler(MessageController.getMessages));
 router.get('/messages/:id', asyncHandler(MessageController.getMessageById));
 router.post('/messages', asyncHandler(MessageController.createMessage));
 router.put('/messages/:id', asyncHandler(MessageController.updateMessage));
 router.delete('/messages/:id', asyncHandler(MessageController.deleteMessage)
 );
+
+//ZaloPay Route
+router.post('/payment', ZaloPayController.createPayment);
+router.post('/callback', ZaloPayController.handleCallback);
+router.post('/order-status/:app_trans_id', ZaloPayController.getOrderStatus);
+router.post('/refund-money/:zp_trans_id', ZaloPayController.refundMoney)
+router.post('/refund-status/:m_refund_id', ZaloPayController.refundMoneyStatus);
 
